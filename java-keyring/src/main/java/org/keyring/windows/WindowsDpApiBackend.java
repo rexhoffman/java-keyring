@@ -37,6 +37,7 @@ import java.util.List;
 import java.util.logging.Level;
 import java.util.logging.Logger;
 
+import org.keyring.BackendNotSupportedException;
 import org.keyring.KeyringBackend;
 import org.keyring.PasswordRetrievalException;
 import org.keyring.PasswordSaveException;
@@ -86,45 +87,32 @@ public class WindowsDpApiBackend extends KeyringBackend {
     FileBasedLock fileLock = new FileBasedLock(getLockPath());
 
     try {
-      //
       fileLock.lock();
-
-      //
-      PasswordEntry targetEntry = null;
-
-      for (PasswordEntry entry : loadPasswordEntries()) {
-        if (entry.getService().equals(service) && entry.getAccount().equals(account)) {
-          targetEntry = entry;
-          break;
-        }
-      }
-
+      PasswordEntry targetEntry = findEntry(service, account, loadPasswordEntries());
       if (targetEntry == null) {
         throw new PasswordRetrievalException("Password related to the specified service and account is not found");
       }
-
-      //
-      byte[] decryptedBytes;
-
-      try {
-        decryptedBytes = Crypt32Util.cryptUnprotectData(targetEntry.getPassword());
-      } catch (Exception ex) {
-        throw new PasswordRetrievalException("Failed to decrypt password");
-      }
-
-      //
-      try {
-        return new String(decryptedBytes, "UTF-8");
-      } catch (UnsupportedEncodingException ex) {
-        throw new PasswordRetrievalException("Unsupported encoding 'UTF-8' specified");
-      }
-
+      return decryptPassword(targetEntry);
     } finally {
       try {
         fileLock.release();
       } catch (Exception ex) {
         Logger.getLogger(WindowsDpApiBackend.class.getName()).log(Level.SEVERE, null, ex);
       }
+    }
+  }
+
+  private String decryptPassword(PasswordEntry targetEntry) throws PasswordRetrievalException {
+    byte[] decryptedBytes;
+    try {
+      decryptedBytes = Crypt32Util.cryptUnprotectData(targetEntry.getPassword());
+    } catch (Exception ex) {
+      throw new PasswordRetrievalException("Failed to decrypt password");
+    }
+    try {
+      return new String(decryptedBytes, "UTF-8");
+    } catch (UnsupportedEncodingException ex) {
+      throw new PasswordRetrievalException("Unsupported encoding 'UTF-8' specified");
     }
   }
 
@@ -147,39 +135,16 @@ public class WindowsDpApiBackend extends KeyringBackend {
     FileBasedLock fileLock = new FileBasedLock(getLockPath());
 
     try {
-      //
       fileLock.lock();
-
-      //
-      byte[] encryptedBytes;
-
-      try {
-        encryptedBytes = Crypt32Util.cryptProtectData(password.getBytes("UTF-8"));
-      } catch (UnsupportedEncodingException ex) {
-        throw new PasswordSaveException("Unsupported encoding 'UTF-8' specified");
-      } catch (Exception ex) {
-        throw new PasswordSaveException("Failed to encrypt password");
-      }
-
-      //
       List<PasswordEntry> entries = loadPasswordEntries();
-      PasswordEntry targetEntry = null;
-
-      for (PasswordEntry entry : entries) {
-        if (entry.getService().equals(service) && entry.getAccount().equals(account)) {
-          targetEntry = entry;
-          break;
-        }
-      }
-
+      PasswordEntry targetEntry = findEntry(service, account, entries);
+      final byte[] encryptedBytes = encryptPassword(password);
       if (targetEntry != null) {
         targetEntry.setPassword(encryptedBytes);
       } else {
         entries.add(new PasswordEntry(service, account, encryptedBytes));
       }
-
-      //
-      savePasswordEnetires(entries);
+      savePasswordEntries(entries);
     } finally {
       try {
         fileLock.release();
@@ -189,6 +154,66 @@ public class WindowsDpApiBackend extends KeyringBackend {
     }
   }
 
+  private byte[] encryptPassword(String password) throws PasswordSaveException {
+    byte[] encryptedBytes;
+
+    try {
+      encryptedBytes = Crypt32Util.cryptProtectData(password.getBytes("UTF-8"));
+    } catch (UnsupportedEncodingException ex) {
+      throw new PasswordSaveException("Unsupported encoding 'UTF-8' specified");
+    } catch (Exception ex) {
+      throw new PasswordSaveException("Failed to encrypt password");
+    }
+
+    //
+    return encryptedBytes;
+  }
+
+  /**
+   * Deletes password from the key store.
+   *
+   * @param service
+   *          Service name
+   * @param account
+   *          Account name
+   *
+   * @throws PasswordSaveException
+   *           Thrown when an error happened while saving the password
+   */
+  @Override
+  public void deletePassword(String service, String account) throws LockException, PasswordSaveException {
+
+    FileBasedLock fileLock = new FileBasedLock(getLockPath());
+
+    try {
+      fileLock.lock();
+      List<PasswordEntry> entries = loadPasswordEntries();
+      PasswordEntry targetEntry = findEntry(service, account, entries);
+      if (targetEntry != null) {
+        entries.remove(targetEntry);
+      }
+      savePasswordEntries(entries);
+    } finally {
+      try {
+        fileLock.release();
+      } catch (Exception ex) {
+        Logger.getLogger(WindowsDpApiBackend.class.getName()).log(Level.SEVERE, null, ex);
+      }
+    }
+  }
+
+  private PasswordEntry findEntry(String service, String account, List<PasswordEntry> entries) {
+    PasswordEntry targetEntry = null;
+    for (PasswordEntry entry : entries) {
+      if (entry.getService().equals(service) && entry.getAccount().equals(account)) {
+        targetEntry = entry;
+        break;
+      }
+    }
+    return targetEntry;
+  }  
+  
+  
   /**
    * Gets backend ID.
    */
@@ -235,7 +260,7 @@ public class WindowsDpApiBackend extends KeyringBackend {
    * @throws PasswordSaveException
    *           Thrown when an error happened while writing to a file
    */
-  private void savePasswordEnetires(List<PasswordEntry> entries) throws PasswordSaveException {
+  private void savePasswordEntries(List<PasswordEntry> entries) throws PasswordSaveException {
 
     try {
       ObjectOutputStream fout = new ObjectOutputStream(new FileOutputStream(keyStorePath));
@@ -251,4 +276,9 @@ public class WindowsDpApiBackend extends KeyringBackend {
     }
   }
 
-} // class WindowsDPAPIBackend
+  @Override
+  public void setup() throws BackendNotSupportedException {
+    //no op
+  }
+
+}

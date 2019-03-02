@@ -44,14 +44,12 @@ class NativeLibraryManager {
    * An instance of SecurityLibrary.
    */
   public static SecurityLibrary Security = null;
-
   
   @SuppressWarnings("deprecation")
   public static synchronized void loadNativeLibraries() throws BackendNotSupportedException {
     if (CoreFoundation != null && Security != null) {
       return;
     }
-
     try {
       CoreFoundation = (CoreFoundationLibrary) Native.loadLibrary("CoreFoundation", CoreFoundationLibrary.class);
       Security = (SecurityLibrary) Native.loadLibrary("Security", SecurityLibrary.class);
@@ -59,5 +57,4 @@ class NativeLibraryManager {
       throw new BackendNotSupportedException("Failed to load native library");
     }
   }
-
-} // class NativeLibraryManager
+}

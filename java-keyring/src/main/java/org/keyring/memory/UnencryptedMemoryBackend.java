@@ -29,6 +29,7 @@ package org.keyring.memory;
 import java.util.HashMap;
 import java.util.Map;
 
+import org.keyring.BackendNotSupportedException;
 import org.keyring.KeyringBackend;
 import org.keyring.PasswordRetrievalException;
 import org.keyring.PasswordSaveException;
@@ -113,28 +114,51 @@ public class UnencryptedMemoryBackend extends KeyringBackend {
    */
   @Override
   public void setPassword(String service, String account, String password) throws LockException, PasswordSaveException {
-
     synchronized (unencryptedMemoryStore) {
-      //
-      String[] targetKey = null;
-
-      for (Map.Entry<String[], String> entries : unencryptedMemoryStore.entrySet()) {
-        String[] serviceAndAccount = entries.getKey();
-
-        if (serviceAndAccount[0].equals(service) && serviceAndAccount[1].equals(account)) {
-          targetKey = serviceAndAccount;
-          break;
-        }
-      }
-
-      //
+      String[] targetKey = findEntry(service, account);
       if (targetKey == null) {
         targetKey = new String[] { service, account };
       }
       unencryptedMemoryStore.put(targetKey, password);
-    } // synchronized
+    }
   }
 
+  /**
+   * Delete password from key store.
+   *
+   * @param service
+   *          Service name
+   * @param account
+   *          Account name
+   *
+   * @throws PasswordSaveException
+   *           Thrown when an error happened while saving the password
+   */
+  @Override
+  public void deletePassword(String service, String account) throws LockException, PasswordSaveException {
+    synchronized (unencryptedMemoryStore) {
+      String[] targetKey = findEntry(service, account);
+      if (targetKey != null) {
+        unencryptedMemoryStore.remove(targetKey);
+      }
+    }
+  }
+
+  private String[] findEntry(String service, String account) {
+    String[] targetKey = null;
+
+    for (Map.Entry<String[], String> entries : unencryptedMemoryStore.entrySet()) {
+      String[] serviceAndAccount = entries.getKey();
+
+      if (serviceAndAccount[0].equals(service) && serviceAndAccount[1].equals(account)) {
+        targetKey = serviceAndAccount;
+        break;
+      }
+    }
+    return targetKey;
+  }
+  
+  
   /**
    * Gets backend ID.
    */
@@ -143,4 +167,8 @@ public class UnencryptedMemoryBackend extends KeyringBackend {
     return "UncryptedMemory";
   }
 
-} // class UncryptedMemoryBackend
+  @Override
+  public void setup() throws BackendNotSupportedException {
+    //no op
+  }
+}

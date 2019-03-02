@@ -26,13 +26,12 @@
  */
 package org.keyring.osx;
 
-import static org.junit.Assert.assertFalse;
-import static org.junit.Assert.assertTrue;
-import static org.junit.Assert.fail;
+import static org.assertj.core.api.Assertions.assertThat;
+import static org.assertj.core.api.Assertions.assertThatThrownBy;
+import static org.assertj.core.api.Assertions.catchThrowable;
 import static org.junit.Assume.assumeTrue;
 
 import org.junit.Test;
-import org.keyring.BackendNotSupportedException;
 import org.keyring.PasswordRetrievalException;
 
 import com.sun.jna.Platform;
@@ -54,11 +53,7 @@ public class OsxKeychainBackendTest {
   @Test
   public void testSetup() throws Exception {
     assumeTrue(Platform.isMac());
-    try {
-      new OsxKeychainBackend().setup();
-    } catch (BackendNotSupportedException ex) {
-      fail();
-    }
+    assertThat(catchThrowable(() -> new OsxKeychainBackend().setup())).as("Setup should succeed").doesNotThrowAnyException();
   }
 
   /**
@@ -67,7 +62,7 @@ public class OsxKeychainBackendTest {
   @Test
   public void testIsSupported() {
     assumeTrue(Platform.isMac());
-    assertTrue(new OsxKeychainBackend().isSupported());
+    assertThat(new OsxKeychainBackend().isSupported()).isTrue();
   }
 
   /**
@@ -76,32 +71,23 @@ public class OsxKeychainBackendTest {
   @Test
   public void testIsKeyStorePathRequired() {
     assumeTrue(Platform.isMac());
-    assertFalse(new OsxKeychainBackend().isKeyStorePathRequired());
+    assertThat(new OsxKeychainBackend().isKeyStorePathRequired()).isFalse();
   }
 
   /**
    * Test of getPassword method, of class OSXKeychainBackend.
    */
   @Test
-  public void testGetPassword() throws Exception {
+  public void testPasswordFlow() throws Exception {
     assumeTrue(Platform.isMac());
     OsxKeychainBackend backend = new OsxKeychainBackend();
     backend.setup();
+    catchThrowable(() -> backend.deletePassword(SERVICE, ACCOUNT));
     checkExistanceOfPasswordEntry(backend);
     backend.setPassword(SERVICE, ACCOUNT, PASSWORD);
-    assertTrue(PASSWORD.equals(backend.getPassword(SERVICE, ACCOUNT)));
-  }
-
-  /**
-   * Test of setPassword method, of class OSXKeychainBackend.
-   */
-  @Test
-  public void testSetPassword() throws Exception {
-    assumeTrue(Platform.isMac());
-    OsxKeychainBackend backend = new OsxKeychainBackend();
-    backend.setup();
-    backend.setPassword(SERVICE, ACCOUNT, PASSWORD);
-    assertTrue(PASSWORD.equals(backend.getPassword(SERVICE, ACCOUNT)));
+    assertThat(backend.getPassword(SERVICE, ACCOUNT)).isEqualTo(PASSWORD);
+    backend.deletePassword(SERVICE, ACCOUNT);
+    assertThatThrownBy(() -> backend.getPassword(SERVICE, ACCOUNT)).isInstanceOf(PasswordRetrievalException.class);
   }
 
   /**
@@ -109,16 +95,12 @@ public class OsxKeychainBackendTest {
    */
   @Test
   public void testGetId() {
-    assertTrue("OSXKeychain".equals(new OsxKeychainBackend().getId()));
+    assertThat(new OsxKeychainBackend().getId()).isEqualTo("OSXKeychain");
   }
 
   private static void checkExistanceOfPasswordEntry(OsxKeychainBackend backend) {
-    try {
-      backend.getPassword(SERVICE, ACCOUNT);
-      System.err.println(String
-          .format("Please remove password entry '%s' " + "by using Keychain Access before running the tests", SERVICE));
-    } catch (PasswordRetrievalException ex) {
-      // do nothing
-    }
+    assertThatThrownBy(() -> backend.getPassword(SERVICE, ACCOUNT))
+       .as("Please remove password entry '%s' " + "by using Keychain Access before running the tests", SERVICE)
+       .isNotNull();
   }
 }

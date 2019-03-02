@@ -48,4 +48,4 @@ interface CoreFoundationLibrary extends Library {
       CFRelease(
       Pointer cf); // CFTypeRef
 
-} // interface CoreFoundationLibrary
+}

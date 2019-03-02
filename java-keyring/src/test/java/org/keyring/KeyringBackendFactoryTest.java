@@ -29,9 +29,6 @@ package org.keyring;
 import static org.junit.Assert.assertNotNull;
 import static org.junit.Assert.assertTrue;
 import static org.junit.Assert.fail;
-import static org.junit.Assume.assumeTrue;
-
-import java.util.Arrays;
 
 import org.junit.Test;
 import org.keyring.gnome.GnomeKeyringBackend;
@@ -66,66 +63,13 @@ public class KeyringBackendFactoryTest {
 
   /**
    * Test of create method, of class KeyringBackendFactory by specifying
-   * OSXKeychain.
-   */
-  @Test
-  public void testCreateStringOsxKeychain() throws Exception {
-    //
-    assumeTrue(Platform.isMac());
-
-    //
-    KeyringBackend backend = KeyringBackendFactory.create("OSXKeychain");
-
-    assertNotNull(backend);
-    assertTrue(backend instanceof OsxKeychainBackend);
-  }
-
-  /**
-   * Test of create method, of class KeyringBackendFactory by specifying
-   * WindowsDPAPI.
-   */
-  @Test
-  public void testCreateStringWindowsDpApi() throws Exception {
-    //
-    assumeTrue(Platform.isWindows());
-
-    //
-    KeyringBackend backend = KeyringBackendFactory.create("WindowsDPAPI");
-
-    assertNotNull(backend);
-    assertTrue(backend instanceof WindowsDpApiBackend);
-  }
-
-  /**
-   * Test of create method, of class KeyringBackendFactory by specifying
    * UncryptedMemory.
    */
   @Test
   public void testCreateStringUnencryptedMemory() throws Exception {
-    KeyringBackend backend = KeyringBackendFactory.create("UnencryptedMemory");
+    KeyringBackend backend = KeyringBackendFactory.create(Keyrings.UnencryptedMemory);
     assertNotNull(backend);
     assertTrue(backend instanceof UnencryptedMemoryBackend);
   }
 
-  /**
-   * Test of create method, of class KeyringBackendFactory by specifying invalid
-   * backend name.
-   */
-  @Test(expected = BackendNotSupportedException.class)
-  public void testCreateStringInvalid() throws Exception {
-    KeyringBackendFactory.create("MyInvalidBackendName");
-  }
-
-  /**
-   * Test of getAllBackendNames method, of class KeyringBackendFactory.
-   */
-  @Test
-  public void testGetAllBackendNames() {
-    String[] backends = KeyringBackendFactory.getAllBackendNames();
-    assertTrue(backends.length == 4);
-    assertTrue(Arrays.asList(backends).contains("OSXKeychain"));
-    assertTrue(Arrays.asList(backends).contains("WindowsDPAPI"));
-    assertTrue(Arrays.asList(backends).contains("GNOMEKeyring"));
-    assertTrue(Arrays.asList(backends).contains("UnencryptedMemory"));
-  }
 }

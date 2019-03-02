@@ -40,15 +40,17 @@ public abstract class KeyringBackend {
   
   /**
    * Gets backend Id.
+   * 
+   * @return the identifier for the backend.
    */
   public abstract String getId();
 
   /**
    * Setup actual key store.
+   * 
+   * @throws BackendNotSupportedException if setup fails.
    */
-  public void setup() throws BackendNotSupportedException {
-    // to be overrode
-  }
+  public abstract void setup() throws BackendNotSupportedException;
 
   /**
    * Gets path to key store.
@@ -108,4 +110,5 @@ public abstract class KeyringBackend {
   public abstract void setPassword(String service, String account, String password)
       throws LockException, PasswordSaveException;
 
-} // class KeyringBackend
+  public abstract void deletePassword(String service, String account) throws LockException, PasswordSaveException;
+}
