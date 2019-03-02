@@ -30,7 +30,7 @@ import static org.junit.Assert.assertEquals;
 import static org.junit.Assert.assertNull;
 
 import org.junit.Test;
-import org.keyring.util.LockException;
+import org.keyring.memory.UnencryptedMemoryBackend;
 
 /**
  * Test of KeyringBackend class.
@@ -42,7 +42,7 @@ public class KeyringBackendTest {
    */
   @Test
   public void testGetKeyStorePath() {
-    KeyringBackend instance = new KeyringBackendImpl();
+    KeyringBackend instance = new UnencryptedMemoryBackend();
     assertNull(instance.getKeyStorePath());
     instance.setKeyStorePath("/path/to/keystore");
     assertEquals("/path/to/keystore", instance.getKeyStorePath());
@@ -53,48 +53,10 @@ public class KeyringBackendTest {
    */
   @Test
   public void testSetKeyStorePath() {
-    KeyringBackend instance = new KeyringBackendImpl();
+    KeyringBackend instance = new UnencryptedMemoryBackend();
     instance.setKeyStorePath("/path/to/keystore");
     assertEquals("/path/to/keystore", instance.getKeyStorePath());
   }
 
-  public class KeyringBackendImpl extends KeyringBackend {
-
-    @Override
-    public boolean isSupported() {
-      return false;
-    }
-
-    @Override
-    public boolean isKeyStorePathRequired() {
-      return false;
-    }
-
-    @Override
-    public String getPassword(String service, String account) throws LockException, PasswordRetrievalException {
-      return "";
-    }
-
-    @Override
-    public void setPassword(String service, String account, String password)
-        throws LockException, PasswordSaveException {
-      //no op.
-    }
-    
-    @Override
-    public void deletePassword(String service, String account)
-        throws LockException, PasswordSaveException {
-      //no op.
-    }
-
-    @Override
-    public String getId() {
-      return "";
-    }
-
-    @Override
-    public void setup() throws BackendNotSupportedException {
-      //no op.
-    }
-  }
+ 
 }
