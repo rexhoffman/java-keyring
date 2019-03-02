@@ -30,18 +30,17 @@
  */
 package org.keyring.windows;
 
+import static org.assertj.core.api.Assertions.assertThat;
+import static org.assertj.core.api.Assertions.assertThatThrownBy;
+import static org.assertj.core.api.Assertions.catchThrowable;
 import static org.junit.Assert.assertEquals;
 import static org.junit.Assert.assertTrue;
 import static org.junit.Assume.assumeTrue;
 
 import java.io.File;
-import java.io.IOException;
 
 import org.junit.Test;
-import org.keyring.BackendNotSupportedException;
 import org.keyring.PasswordRetrievalException;
-import org.keyring.PasswordSaveException;
-import org.keyring.util.LockException;
 
 import com.sun.jna.Platform;
 
@@ -79,68 +78,23 @@ public class WindowsDpApiBackendTest {
   }
 
   /**
-   * Test of getPassword method, of class WindowsDPAPIBackend by specifying
-   * invalid entry.
-   */
-  @Test(expected = PasswordRetrievalException.class)
-  public void testGetPasswordInvalidEntry() throws Exception {
-    assumeTrue(Platform.isWindows());
-    File keystore = File.createTempFile(KEYSTORE_PREFIX, KEYSTORE_SUFFIX);
-    WindowsDpApiBackend backend = new WindowsDpApiBackend();
-    backend.setKeyStorePath(keystore.getPath());
-    backend.setup();
-    backend.getPassword(SERVICE, ACCOUNT);
-  }
-
-  /**
-   * Test of getPassword method, of class WindowsDPAPIBackend by specifying
-   * valid entry.
-   * 
-   * @throws IOException xxx.
-   * @throws BackendNotSupportedException xxx.
-   * @throws LockException xxx.
-   * @throws PasswordSaveException xxx.
-   * @throws PasswordRetrievalException xxx.
-   */
-  public void testGetPasswordValidEntry() throws IOException, BackendNotSupportedException, LockException,
-      PasswordSaveException, PasswordRetrievalException {
-    assumeTrue(Platform.isWindows());
-    File keystore = File.createTempFile(KEYSTORE_PREFIX, KEYSTORE_SUFFIX);
-    WindowsDpApiBackend backend = new WindowsDpApiBackend();
-    backend.setKeyStorePath(keystore.getPath());
-    backend.setup();
-    backend.setPassword(SERVICE, ACCOUNT, PASSWORD);
-    assertEquals(PASSWORD, backend.getPassword(SERVICE, ACCOUNT));
-  }
-
-  /**
-   * Test of setPassword method, of class WindowsDPAPIBackend.
+   * Test of getPassword method, of class OSXKeychainBackend.
    */
   @Test
-  public void testSetPassword() throws Exception {
+  public void testPasswordFlow() throws Exception {
     assumeTrue(Platform.isWindows());
     File keystore = File.createTempFile(KEYSTORE_PREFIX, KEYSTORE_SUFFIX);
     WindowsDpApiBackend backend = new WindowsDpApiBackend();
     backend.setKeyStorePath(keystore.getPath());
     backend.setup();
+    catchThrowable(() -> backend.deletePassword(SERVICE, ACCOUNT));
     backend.setPassword(SERVICE, ACCOUNT, PASSWORD);
-    assertEquals(PASSWORD, backend.getPassword(SERVICE, ACCOUNT));
-  }
-  
-  /**
-   * Test of setPassword method, of class WindowsDPAPIBackend.
-   */
-  @Test
-  public void testDeletePassword() throws Exception {
-    assumeTrue(Platform.isWindows());
-    File keystore = File.createTempFile(KEYSTORE_PREFIX, KEYSTORE_SUFFIX);
-    WindowsDpApiBackend backend = new WindowsDpApiBackend();
-    backend.setKeyStorePath(keystore.getPath());
-    backend.setup();
+    assertThat(backend.getPassword(SERVICE, ACCOUNT)).isEqualTo(PASSWORD);
     backend.deletePassword(SERVICE, ACCOUNT);
-    assertEquals(PASSWORD, backend.getPassword(SERVICE, ACCOUNT));
-  }
-
+    assertThatThrownBy(() -> backend.getPassword(SERVICE, ACCOUNT)).isInstanceOf(PasswordRetrievalException.class);
+  }  
+  
+  
   /**
    * Test of getID method, of class WindowsDPAPIBackend.
    */

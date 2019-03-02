@@ -15,8 +15,9 @@
 
     <properties>
         <github.site.location>${project.version}/${project.artifactId}</github.site.location>
-        <parameter.jacoco.branch.coverage>0.26</parameter.jacoco.branch.coverage>
-        <parameter.jacoco.instruction.coverage>0.37</parameter.jacoco.instruction.coverage>
+        <!-- little can be done here to assert high levels of coverage due to os dependencies. -->
+        <parameter.jacoco.branch.coverage>0.20</parameter.jacoco.branch.coverage>
+        <parameter.jacoco.instruction.coverage>0.20</parameter.jacoco.instruction.coverage>
     </properties>
 
     <dependencies>
