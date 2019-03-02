@@ -39,7 +39,10 @@ public class Keyring {
   private KeyringBackend backend;
   
   /**
-   * Creates an instance of Keyring.
+   * Creates an instance of Keyring using the a default backed based on operating system.
+   * 
+   * @return a functional Keyring or a BackendNotSupportedException is thrown.
+   * @throws BackendNotSupportedException if the default backend for the operating system is unsupported.
    */
   public static Keyring create() throws BackendNotSupportedException {
     return new Keyring(KeyringBackendFactory.create());
@@ -48,32 +51,27 @@ public class Keyring {
   /**
    * Creates an instance of Keyring with specified backend.
    *
-   * @param backendType
-   *          Backend type
+   * @param keyring desired backend.
+   * @return a functional Keyring or a BackendNotSupportedException is thrown.
+   * @throws BackendNotSupportedException if the default backend for the operating system is unsupported.
    */
-  public static Keyring create(String backendType) throws BackendNotSupportedException {
-    return new Keyring(KeyringBackendFactory.create(backendType));
+  public static Keyring create(Keyrings keyring) throws BackendNotSupportedException {
+    return new Keyring(KeyringBackendFactory.create(keyring));
   }
 
   /**
    * Initializes an instance of Keyring.
    *
-   * @param backend
-   *          Keyring backend instance
+   * @param backend Keyring backend instance
    */
   private Keyring(KeyringBackend backend) {
     this.backend = backend;
   }
 
   /**
-   * Returns keyring backend instance.
-   */
-  public KeyringBackend getBackend() {
-    return backend;
-  }
-
-  /**
    * Gets path to key store (Proxy method of KeyringBackend.getKeyStorePath).
+   * 
+   * @return path to the keystore.
    */
   public String getKeyStorePath() {
     return backend.getKeyStorePath();
@@ -82,8 +80,7 @@ public class Keyring {
   /**
    * Sets path to key store (Proxy method of KeyringBackend.setKeyStorePath).
    *
-   * @param path
-   *          Path to key store
+   * @param path Path to key store
    */
   public void setKeyStorePath(String path) {
     backend.setKeyStorePath(path);
@@ -92,6 +89,8 @@ public class Keyring {
   /**
    * Returns true if the backend directory uses some file to store passwords.
    * (Proxy method of KeyringBackend.isKeyStorePathRequired)
+   * 
+   * @return if a path is required to store a password.
    */
   public boolean isKeyStorePathRequired() {
     return backend.isKeyStorePathRequired();
@@ -113,7 +112,6 @@ public class Keyring {
    *           can't establish lock.
    */
   public String getPassword(String service, String account) throws LockException, PasswordRetrievalException {
-
     return backend.getPassword(service, account);
   }
 
@@ -133,9 +131,23 @@ public class Keyring {
    *           can't establish lock.
    */
   public void setPassword(String service, String account, String password) throws LockException, PasswordSaveException {
-
     backend.setPassword(service, account, password);
   }
-
-
-} // class Keyring
+  
+  /**
+   * Sets password to key store (Proxy method of KeyringBackend.setPassword)
+   *
+   * @param service
+   *          Service name
+   * @param account
+   *          Account name
+   *
+   * @throws PasswordSaveException
+   *           Thrown when an error happened while saving the password
+   * @throws LockException
+   *           can't establish lock.
+   */
+  public void deletePassword(String service, String account) throws LockException, PasswordSaveException {
+    backend.deletePassword(service, account);
+  }
+}

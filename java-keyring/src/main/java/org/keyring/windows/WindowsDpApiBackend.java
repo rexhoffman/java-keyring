@@ -37,6 +37,7 @@ import java.util.List;
 import java.util.logging.Level;
 import java.util.logging.Logger;
 
+import org.keyring.BackendNotSupportedException;
 import org.keyring.KeyringBackend;
 import org.keyring.PasswordRetrievalException;
 import org.keyring.PasswordSaveException;
@@ -190,6 +191,46 @@ public class WindowsDpApiBackend extends KeyringBackend {
   }
 
   /**
+   * Deletes password from the key store.
+   *
+   * @param service
+   *          Service name
+   * @param account
+   *          Account name
+   *
+   * @throws PasswordSaveException
+   *           Thrown when an error happened while saving the password
+   */
+  @Override
+  public void deletePassword(String service, String account) throws LockException, PasswordSaveException {
+
+    FileBasedLock fileLock = new FileBasedLock(getLockPath());
+
+    try {
+      fileLock.lock();
+      List<PasswordEntry> entries = loadPasswordEntries();
+      PasswordEntry targetEntry = null;
+      for (PasswordEntry entry : entries) {
+        if (entry.getService().equals(service) && entry.getAccount().equals(account)) {
+          targetEntry = entry;
+          break;
+        }
+      }
+      if (targetEntry != null) {
+        entries.remove(targetEntry);
+      }
+      savePasswordEnetires(entries);
+    } finally {
+      try {
+        fileLock.release();
+      } catch (Exception ex) {
+        Logger.getLogger(WindowsDpApiBackend.class.getName()).log(Level.SEVERE, null, ex);
+      }
+    }
+  }  
+  
+  
+  /**
    * Gets backend ID.
    */
   @Override
@@ -251,4 +292,8 @@ public class WindowsDpApiBackend extends KeyringBackend {
     }
   }
 
-} // class WindowsDPAPIBackend
+  @Override
+  public void setup() throws BackendNotSupportedException {
+  }
+
+}

@@ -139,6 +139,25 @@ public class GnomeKeyringBackend extends KeyringBackend {
     map.put(service + "/" + account, ref.getValue());
     saveMap(map);
   }
+  
+  /**
+   * Delete password to key store.
+   *
+   * @param service
+   *          Service name
+   * @param account
+   *          Account name
+   *
+   * @throws PasswordSaveException
+   *           Thrown when an error happened while saving the password
+   */
+  @Override
+  public void deletePassword(String service, String account) throws PasswordSaveException {
+    Map<String, Integer> map = loadMap();
+    map.remove(service + "/" + account);
+    saveMap(map);
+  }
+  
 
   /**
    * Gets backend ID.

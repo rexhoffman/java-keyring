@@ -126,6 +126,20 @@ public class WindowsDpApiBackendTest {
     backend.setPassword(SERVICE, ACCOUNT, PASSWORD);
     assertEquals(PASSWORD, backend.getPassword(SERVICE, ACCOUNT));
   }
+  
+  /**
+   * Test of setPassword method, of class WindowsDPAPIBackend.
+   */
+  @Test
+  public void testDeletePassword() throws Exception {
+    assumeTrue(Platform.isWindows());
+    File keystore = File.createTempFile(KEYSTORE_PREFIX, KEYSTORE_SUFFIX);
+    WindowsDpApiBackend backend = new WindowsDpApiBackend();
+    backend.setKeyStorePath(keystore.getPath());
+    backend.setup();
+    backend.deletePassword(SERVICE, ACCOUNT);
+    assertEquals(PASSWORD, backend.getPassword(SERVICE, ACCOUNT));
+  }
 
   /**
    * Test of getID method, of class WindowsDPAPIBackend.

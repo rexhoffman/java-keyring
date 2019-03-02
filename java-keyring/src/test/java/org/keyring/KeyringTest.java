@@ -26,18 +26,17 @@
  */
 package org.keyring;
 
+import static org.assertj.core.api.Assertions.assertThat;
+import static org.assertj.core.api.Assertions.assertThatThrownBy;
+import static org.assertj.core.api.Assertions.catchThrowable;
 import static org.junit.Assert.assertEquals;
 import static org.junit.Assert.assertNotNull;
 import static org.junit.Assert.assertNull;
-import static org.junit.Assert.assertTrue;
 
 import java.io.File;
 
 import org.junit.Test;
-import org.keyring.gnome.GnomeKeyringBackend;
-import org.keyring.memory.UnencryptedMemoryBackend;
 import org.keyring.osx.OsxKeychainBackend;
-import org.keyring.windows.WindowsDpApiBackend;
 
 import com.sun.jna.Platform;
 
@@ -63,8 +62,6 @@ public class KeyringTest {
   public void testCreateZeroArgs() throws Exception {
     Keyring keyring = Keyring.create();
     assertNotNull(keyring);
-    assertNotNull(keyring.getBackend());
-    //assertTrue(keyring.getBackend() instanceof KeyringBackend);
   }
 
   /**
@@ -72,47 +69,14 @@ public class KeyringTest {
    */
   @Test
   public void testCreateString() throws Exception {
-    Keyring keyring;
     if (Platform.isMac()) {
-      keyring = Keyring.create("OSXKeychain");
-      assertNotNull(keyring);
-      assertNotNull(keyring.getBackend());
-      assertTrue(keyring.getBackend() instanceof OsxKeychainBackend);
+      assertThat(Keyring.create(Keyrings.OSXKeychain)).isNotNull();
     } else if (Platform.isWindows()) {
-      keyring = Keyring.create("WindowsDPAPI");
-      assertNotNull(keyring);
-      assertNotNull(keyring.getBackend());
-      assertTrue(keyring.getBackend() instanceof WindowsDpApiBackend);
+      assertThat(Keyring.create(Keyrings.WindowsDPAPI)).isNotNull();
     } else if (Platform.isLinux()) {
-      keyring = Keyring.create("GNOMEKeyring");
-      assertNotNull(keyring);
-      assertNotNull(keyring.getBackend());
-      assertTrue(keyring.getBackend() instanceof GnomeKeyringBackend);
+      assertThat(Keyring.create(Keyrings.GNOMEKeyring)).isNotNull();
     }
-    keyring = Keyring.create("UnencryptedMemory");
-    assertNotNull(keyring);
-    assertNotNull(keyring.getBackend());
-    assertTrue(keyring.getBackend() instanceof UnencryptedMemoryBackend);
-  }
-
-  /**
-   * Test of getBackend method, of class Keyring.
-   */
-  @Test
-  public void testGetBackend() throws Exception {
-    Keyring keyring = Keyring.create();
-
-    assertNotNull(keyring.getBackend());
-
-    if (Platform.isMac()) {
-      assertTrue(keyring.getBackend() instanceof OsxKeychainBackend);
-    } else if (Platform.isWindows()) {
-      assertTrue(keyring.getBackend() instanceof WindowsDpApiBackend);
-    } else if (Platform.isLinux()) {
-      assertTrue(keyring.getBackend() instanceof GnomeKeyringBackend);
-    } else {
-      assertTrue(keyring.getBackend() instanceof UnencryptedMemoryBackend);
-    }
+    assertThat(Keyring.create(Keyrings.UnencryptedMemory)).isNotNull();
   }
 
   /**
@@ -136,48 +100,35 @@ public class KeyringTest {
     assertEquals("/path/to/keystore", keyring.getKeyStorePath());
   }
 
-  /**
-   * Test of isKeyStorePathRequired method, of class Keyring.
-   */
-  @Test
-  public void testIsKeyStorePathRequired() throws Exception {
-    Keyring keyring = Keyring.create();
-    assertEquals(keyring.isKeyStorePathRequired(), keyring.getBackend().isKeyStorePathRequired());
-  }
 
   /**
-   * Test of getPassword method, of class Keyring.
+   * Test of getPassword method, of class OSXKeychainBackend.
    */
   @Test
-  public void testGetPassword() throws Exception {
+  public void testPasswordFlow() throws Exception {
     Keyring keyring = Keyring.create();
     if (keyring.isKeyStorePathRequired()) {
       keyring.setKeyStorePath(File.createTempFile(KEYSTORE_PREFIX, KEYSTORE_SUFFIX).getPath());
     }
+    catchThrowable(() -> keyring.deletePassword(SERVICE, ACCOUNT));
     checkExistanceOfPasswordEntry(keyring);
     keyring.setPassword(SERVICE, ACCOUNT, PASSWORD);
-    assertEquals(PASSWORD, keyring.getPassword(SERVICE, ACCOUNT));
+    assertThat(keyring.getPassword(SERVICE, ACCOUNT)).isEqualTo(PASSWORD);
+    keyring.deletePassword(SERVICE, ACCOUNT);
+    assertThatThrownBy(() -> keyring.getPassword(SERVICE, ACCOUNT)).isInstanceOf(PasswordRetrievalException.class);
   }
 
   /**
-   * Test of setPassword method, of class Keyring.
+   * Test of getID method, of class OSXKeychainBackend.
    */
   @Test
-  public void testSetPassword() throws Exception {
-    Keyring keyring = Keyring.create();
-    if (keyring.isKeyStorePathRequired()) {
-      keyring.setKeyStorePath(File.createTempFile(KEYSTORE_PREFIX, KEYSTORE_SUFFIX).getPath());
-    }
-    keyring.setPassword(SERVICE, ACCOUNT, PASSWORD);
-    assertEquals(PASSWORD, keyring.getPassword(SERVICE, ACCOUNT));
+  public void testGetId() {
+    assertThat(new OsxKeychainBackend().getId()).isEqualTo("OSXKeychain");
   }
 
-  private void checkExistanceOfPasswordEntry(Keyring keyring) {
-    try {
-      keyring.getPassword(SERVICE, ACCOUNT);
-      System.err.println(String.format("Please remove password entry '%s' before running the tests", SERVICE));
-    } catch (Exception ex) {
-      //TODO: better solution needed
-    }
+  private static void checkExistanceOfPasswordEntry(Keyring keyring) {
+    assertThatThrownBy(() -> keyring.getPassword(SERVICE, ACCOUNT))
+       .as("Please remove password entry '%s' " + "by using Keychain Access before running the tests", SERVICE)
+       .isNotNull();
   }
 }

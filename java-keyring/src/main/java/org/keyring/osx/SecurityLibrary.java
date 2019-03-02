@@ -81,4 +81,4 @@ interface SecurityLibrary extends Library {
       Pointer[] attrList, // SecKeychainAttributeList*
       Pointer data); // void*
 
-} // interface SecurityLibrary
+}

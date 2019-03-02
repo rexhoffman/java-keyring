@@ -80,10 +80,20 @@ public class KeyringBackendTest {
         throws LockException, PasswordSaveException {
       //no op.
     }
+    
+    @Override
+    public void deletePassword(String service, String account)
+        throws LockException, PasswordSaveException {
+      //no op.
+    }
 
     @Override
     public String getId() {
       return "";
+    }
+
+    @Override
+    public void setup() throws BackendNotSupportedException {
     }
   }
 }

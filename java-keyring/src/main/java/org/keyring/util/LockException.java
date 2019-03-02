@@ -45,4 +45,4 @@ public class LockException extends Exception {
     super(message, innerException);
   }
 
-} // class LockException
+}

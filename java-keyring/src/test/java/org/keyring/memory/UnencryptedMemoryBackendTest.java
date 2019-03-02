@@ -34,7 +34,7 @@ import org.junit.Test;
 import org.keyring.PasswordRetrievalException;
 
 /**
- * Test of UncryptedMemoryBackend class.
+ * Test of UnencryptedMemoryBackend class.
  */
 public class UnencryptedMemoryBackendTest {
 
