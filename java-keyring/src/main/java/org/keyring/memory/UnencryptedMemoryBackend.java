@@ -114,26 +114,13 @@ public class UnencryptedMemoryBackend extends KeyringBackend {
    */
   @Override
   public void setPassword(String service, String account, String password) throws LockException, PasswordSaveException {
-
     synchronized (unencryptedMemoryStore) {
-      //
-      String[] targetKey = null;
-
-      for (Map.Entry<String[], String> entries : unencryptedMemoryStore.entrySet()) {
-        String[] serviceAndAccount = entries.getKey();
-
-        if (serviceAndAccount[0].equals(service) && serviceAndAccount[1].equals(account)) {
-          targetKey = serviceAndAccount;
-          break;
-        }
-      }
-
-      //
+      String[] targetKey = findEntry(service, account);
       if (targetKey == null) {
         targetKey = new String[] { service, account };
       }
       unencryptedMemoryStore.put(targetKey, password);
-    } // synchronized
+    }
   }
 
   /**
@@ -149,23 +136,26 @@ public class UnencryptedMemoryBackend extends KeyringBackend {
    */
   @Override
   public void deletePassword(String service, String account) throws LockException, PasswordSaveException {
-
     synchronized (unencryptedMemoryStore) {
-      //
-      String[] targetKey = null;
-
-      for (Map.Entry<String[], String> entries : unencryptedMemoryStore.entrySet()) {
-        String[] serviceAndAccount = entries.getKey();
-
-        if (serviceAndAccount[0].equals(service) && serviceAndAccount[1].equals(account)) {
-          targetKey = serviceAndAccount;
-          break;
-        }
-      }
+      String[] targetKey = findEntry(service, account);
       if (targetKey != null) {
         unencryptedMemoryStore.remove(targetKey);
       }
     }
+  }
+
+  private String[] findEntry(String service, String account) {
+    String[] targetKey = null;
+
+    for (Map.Entry<String[], String> entries : unencryptedMemoryStore.entrySet()) {
+      String[] serviceAndAccount = entries.getKey();
+
+      if (serviceAndAccount[0].equals(service) && serviceAndAccount[1].equals(account)) {
+        targetKey = serviceAndAccount;
+        break;
+      }
+    }
+    return targetKey;
   }
   
   
