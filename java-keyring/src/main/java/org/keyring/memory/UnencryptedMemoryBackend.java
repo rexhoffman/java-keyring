@@ -169,5 +169,6 @@ public class UnencryptedMemoryBackend extends KeyringBackend {
 
   @Override
   public void setup() throws BackendNotSupportedException {
+    //no op
   }
 }

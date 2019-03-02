@@ -278,6 +278,7 @@ public class WindowsDpApiBackend extends KeyringBackend {
 
   @Override
   public void setup() throws BackendNotSupportedException {
+    //no op
   }
 
 }

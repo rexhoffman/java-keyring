@@ -94,6 +94,7 @@ public class KeyringBackendTest {
 
     @Override
     public void setup() throws BackendNotSupportedException {
+      //no op.
     }
   }
 }
