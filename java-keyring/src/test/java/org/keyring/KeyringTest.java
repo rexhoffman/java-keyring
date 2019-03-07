@@ -39,7 +39,6 @@ import org.ehoffman.classloader.RestrictiveClassloader;
 import org.ehoffman.junit.aop.Junit4AopClassRunner;
 import org.junit.Test;
 import org.junit.runner.RunWith;
-import org.keyring.osx.OsxKeychainBackend;
 
 import com.sun.jna.Platform;
 
@@ -125,15 +124,6 @@ public class KeyringTest {
     assertThat(keyring.getPassword(SERVICE, ACCOUNT)).isEqualTo(PASSWORD);
     keyring.deletePassword(SERVICE, ACCOUNT);
     assertThatThrownBy(() -> keyring.getPassword(SERVICE, ACCOUNT)).isInstanceOf(PasswordRetrievalException.class);
-  }
-
-  /**
-   * Test of getID method, of class OSXKeychainBackend.
-   */
-  @Test
-  @RestrictiveClassloader
-  public void testGetId() throws Exception {
-    assertThat(new OsxKeychainBackend().getId()).isEqualTo("OSXKeychain");
   }
 
   private static void checkExistanceOfPasswordEntry(Keyring keyring) {

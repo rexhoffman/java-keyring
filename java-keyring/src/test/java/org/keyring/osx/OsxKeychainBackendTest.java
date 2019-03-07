@@ -94,6 +94,7 @@ public class OsxKeychainBackendTest {
    */
   @Test
   public void testGetId() throws Exception {
+    assumeTrue(Platform.isMac());
     assertThat(new OsxKeychainBackend().getId()).isEqualTo("OSXKeychain");
   }
 
