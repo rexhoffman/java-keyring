@@ -73,6 +73,7 @@ public class KeyringTest {
    * Test of create method, of class Keyring.
    */
   @Test
+  @RestrictiveClassloader
   public void testCreateString() throws Exception {
     if (Platform.isMac()) {
       assertThat(Keyring.create(Keyrings.OSXKeychain)).isNotNull();
@@ -88,6 +89,7 @@ public class KeyringTest {
    * Test of getKeyStorePath method, of class Keyring.
    */
   @Test
+  @RestrictiveClassloader
   public void testGetKeyStorePath() throws Exception {
     Keyring keyring = Keyring.create();
     assertNull(keyring.getKeyStorePath());
@@ -99,6 +101,7 @@ public class KeyringTest {
    * Test of setKeyStorePath method, of class Keyring.
    */
   @Test
+  @RestrictiveClassloader
   public void testSetKeyStorePath() throws Exception {
     Keyring keyring = Keyring.create();
     keyring.setKeyStorePath("/path/to/keystore");
@@ -110,6 +113,7 @@ public class KeyringTest {
    * Test of getPassword method, of class OSXKeychainBackend.
    */
   @Test
+  @RestrictiveClassloader
   public void testPasswordFlow() throws Exception {
     Keyring keyring = Keyring.create();
     if (keyring.isKeyStorePathRequired()) {
@@ -127,6 +131,7 @@ public class KeyringTest {
    * Test of getID method, of class OSXKeychainBackend.
    */
   @Test
+  @RestrictiveClassloader
   public void testGetId() throws Exception {
     assertThat(new OsxKeychainBackend().getId()).isEqualTo("OSXKeychain");
   }

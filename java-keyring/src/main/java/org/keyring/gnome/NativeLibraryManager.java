@@ -38,18 +38,14 @@ class NativeLibraryManager {
   /**
    * An instance of CoreFoundationLibrary.
    */
-  private GLIB2 glib2 = null;
+  private final GLIB2 glib2;
 
   /**
    * An instance of SecurityLibrary.
    */
-  private GKLib gklib = null;
+  private final GKLib gklib;
   
-  public void loadNativeLibraries() throws BackendNotSupportedException {
-    if (glib2 != null && gklib != null) {
-      return;
-    }
-
+  public NativeLibraryManager() throws BackendNotSupportedException {
     try {
       glib2 = (GLIB2) Native.load("glib-2.0", GLIB2.class);
       gklib = (GKLib) Native.load("gnome-keyring", GKLib.class);

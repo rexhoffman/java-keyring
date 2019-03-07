@@ -30,7 +30,10 @@ import static org.junit.Assert.assertNotNull;
 import static org.junit.Assert.assertTrue;
 import static org.junit.Assert.fail;
 
+import org.ehoffman.classloader.RestrictiveClassloader;
+import org.ehoffman.junit.aop.Junit4AopClassRunner;
 import org.junit.Test;
+import org.junit.runner.RunWith;
 import org.keyring.gnome.GnomeKeyringBackend;
 import org.keyring.memory.UnencryptedMemoryBackend;
 import org.keyring.osx.OsxKeychainBackend;
@@ -41,12 +44,14 @@ import com.sun.jna.Platform;
 /**
  * Test of KeyringBackendFactory class.
  */
+@RunWith(Junit4AopClassRunner.class)
 public class KeyringBackendFactoryTest {
 
   /**
    * Test of create method, of class KeyringBackendFactory.
    */
   @Test
+  @RestrictiveClassloader
   public void testCreateZeroArgs() throws Exception {
     KeyringBackend backend = KeyringBackendFactory.create();
     assertNotNull(backend);
@@ -66,6 +71,7 @@ public class KeyringBackendFactoryTest {
    * UncryptedMemory.
    */
   @Test
+  @RestrictiveClassloader
   public void testCreateStringUnencryptedMemory() throws Exception {
     KeyringBackend backend = KeyringBackendFactory.create(Keyrings.UnencryptedMemory);
     assertNotNull(backend);
