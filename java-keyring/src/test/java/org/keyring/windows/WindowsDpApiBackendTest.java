@@ -86,7 +86,6 @@ public class WindowsDpApiBackendTest {
     File keystore = File.createTempFile(KEYSTORE_PREFIX, KEYSTORE_SUFFIX);
     WindowsDpApiBackend backend = new WindowsDpApiBackend();
     backend.setKeyStorePath(keystore.getPath());
-    backend.setup();
     catchThrowable(() -> backend.deletePassword(SERVICE, ACCOUNT));
     backend.setPassword(SERVICE, ACCOUNT, PASSWORD);
     assertThat(backend.getPassword(SERVICE, ACCOUNT)).isEqualTo(PASSWORD);
@@ -112,7 +111,6 @@ public class WindowsDpApiBackendTest {
     assumeTrue(Platform.isWindows());
     WindowsDpApiBackend backend = new WindowsDpApiBackend();
     backend.setKeyStorePath("/path/to/keystore");
-    backend.setup();
     assertEquals("/path/to/keystore.lock", backend.getLockPath());
   }
 }

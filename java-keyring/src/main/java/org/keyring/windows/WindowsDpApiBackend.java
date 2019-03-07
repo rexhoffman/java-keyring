@@ -37,7 +37,6 @@ import java.util.List;
 import java.util.logging.Level;
 import java.util.logging.Logger;
 
-import org.keyring.BackendNotSupportedException;
 import org.keyring.KeyringBackend;
 import org.keyring.PasswordRetrievalException;
 import org.keyring.PasswordSaveException;
@@ -275,10 +274,4 @@ public class WindowsDpApiBackend extends KeyringBackend {
       throw new PasswordSaveException("Failed to save password entries to a file");
     }
   }
-
-  @Override
-  public void setup() throws BackendNotSupportedException {
-    //no op
-  }
-
 }

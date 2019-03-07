@@ -46,14 +46,9 @@ public abstract class KeyringBackend {
   public abstract String getId();
 
   /**
-   * Setup actual key store.
-   * 
-   * @throws BackendNotSupportedException if setup fails.
-   */
-  public abstract void setup() throws BackendNotSupportedException;
-
-  /**
    * Gets path to key store.
+   * 
+   * @return a keystore path (if required by backend)
    */
   public String getKeyStorePath() {
     return keyStorePath;
@@ -71,11 +66,15 @@ public abstract class KeyringBackend {
 
   /**
    * Returns true when the backend is supported.
+   *
+   * @return true if the backend will function on the machine.
    */
   public abstract boolean isSupported();
 
   /**
    * Returns true if the backend directory uses some file to store passwords.
+   * 
+   * @return true if a key store path is required.
    */
   public abstract boolean isKeyStorePathRequired();
 
@@ -90,6 +89,9 @@ public abstract class KeyringBackend {
    * @return Password related to specified service and account
    *
    * @throws PasswordRetrievalException
+   *           Thrown when an error happened while getting password
+   *           
+   * @throws LockException
    *           Thrown when an error happened while getting password
    */
   public abstract String getPassword(String service, String account) throws LockException, PasswordRetrievalException;
@@ -106,6 +108,9 @@ public abstract class KeyringBackend {
    *
    * @throws PasswordSaveException
    *           Thrown when an error happened while saving the password
+   *           
+   * @throws LockException
+   *           Thrown when an error happened while getting password
    */
   public abstract void setPassword(String service, String account, String password)
       throws LockException, PasswordSaveException;

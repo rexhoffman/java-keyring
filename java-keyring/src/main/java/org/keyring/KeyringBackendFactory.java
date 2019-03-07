@@ -77,11 +77,6 @@ class KeyringBackendFactory {
     if (!backend.isSupported()) {
       return null;
     }
-    try {
-      backend.setup();
-    } catch (BackendNotSupportedException ex) {
-      return null;
-    }
     return backend;
   }
 }

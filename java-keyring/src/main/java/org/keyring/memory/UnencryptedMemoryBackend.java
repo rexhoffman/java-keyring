@@ -29,7 +29,6 @@ package org.keyring.memory;
 import java.util.HashMap;
 import java.util.Map;
 
-import org.keyring.BackendNotSupportedException;
 import org.keyring.KeyringBackend;
 import org.keyring.PasswordRetrievalException;
 import org.keyring.PasswordSaveException;
@@ -165,10 +164,5 @@ public class UnencryptedMemoryBackend extends KeyringBackend {
   @Override
   public String getId() {
     return "UncryptedMemory";
-  }
-
-  @Override
-  public void setup() throws BackendNotSupportedException {
-    //no op
   }
 }

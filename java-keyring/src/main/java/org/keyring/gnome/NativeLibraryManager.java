@@ -38,24 +38,33 @@ class NativeLibraryManager {
   /**
    * An instance of CoreFoundationLibrary.
    */
-  public static GLIB2 glib2 = null;
+  private GLIB2 glib2 = null;
 
   /**
    * An instance of SecurityLibrary.
    */
-  public static GKLib gklib = null;
+  private GKLib gklib = null;
   
-  @SuppressWarnings("deprecation")
-  public static synchronized void loadNativeLibraries() throws BackendNotSupportedException {
+  public void loadNativeLibraries() throws BackendNotSupportedException {
     if (glib2 != null && gklib != null) {
       return;
     }
 
     try {
-      glib2 = (GLIB2) Native.loadLibrary("glib-2.0", GLIB2.class);
-      gklib = (GKLib) Native.loadLibrary("gnome-keyring", GKLib.class);
+      glib2 = (GLIB2) Native.load("glib-2.0", GLIB2.class);
+      gklib = (GKLib) Native.load("gnome-keyring", GKLib.class);
     } catch (UnsatisfiedLinkError ex) {
       throw new BackendNotSupportedException("Failed to load native library");
     }
   }
-} // class NativeLibraryManager
+
+  public GLIB2 getGlib2() {
+    return glib2;
+  }
+
+  public GKLib getGklib() {
+    return gklib;
+  }
+  
+  
+}

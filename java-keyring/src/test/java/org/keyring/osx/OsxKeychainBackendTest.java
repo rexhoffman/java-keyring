@@ -53,14 +53,14 @@ public class OsxKeychainBackendTest {
   @Test
   public void testSetup() throws Exception {
     assumeTrue(Platform.isMac());
-    assertThat(catchThrowable(() -> new OsxKeychainBackend().setup())).as("Setup should succeed").doesNotThrowAnyException();
+    assertThat(catchThrowable(() -> new OsxKeychainBackend())).as("Setup should succeed").doesNotThrowAnyException();
   }
 
   /**
    * Test of isSupported method, of class OSXKeychainBackend.
    */
   @Test
-  public void testIsSupported() {
+  public void testIsSupported() throws Exception {
     assumeTrue(Platform.isMac());
     assertThat(new OsxKeychainBackend().isSupported()).isTrue();
   }
@@ -69,7 +69,7 @@ public class OsxKeychainBackendTest {
    * Test of isKeyStorePathRequired method, of class OSXKeychainBackend.
    */
   @Test
-  public void testIsKeyStorePathRequired() {
+  public void testIsKeyStorePathRequired() throws Exception {
     assumeTrue(Platform.isMac());
     assertThat(new OsxKeychainBackend().isKeyStorePathRequired()).isFalse();
   }
@@ -81,7 +81,6 @@ public class OsxKeychainBackendTest {
   public void testPasswordFlow() throws Exception {
     assumeTrue(Platform.isMac());
     OsxKeychainBackend backend = new OsxKeychainBackend();
-    backend.setup();
     catchThrowable(() -> backend.deletePassword(SERVICE, ACCOUNT));
     checkExistanceOfPasswordEntry(backend);
     backend.setPassword(SERVICE, ACCOUNT, PASSWORD);
@@ -94,7 +93,7 @@ public class OsxKeychainBackendTest {
    * Test of getID method, of class OSXKeychainBackend.
    */
   @Test
-  public void testGetId() {
+  public void testGetId() throws Exception {
     assertThat(new OsxKeychainBackend().getId()).isEqualTo("OSXKeychain");
   }
 

@@ -35,7 +35,10 @@ import static org.junit.Assert.assertNull;
 
 import java.io.File;
 
+import org.ehoffman.classloader.RestrictiveClassloader;
+import org.ehoffman.junit.aop.Junit4AopClassRunner;
 import org.junit.Test;
+import org.junit.runner.RunWith;
 import org.keyring.osx.OsxKeychainBackend;
 
 import com.sun.jna.Platform;
@@ -43,6 +46,7 @@ import com.sun.jna.Platform;
 /**
  * Test of Keyring class.
  */
+@RunWith(Junit4AopClassRunner.class)
 public class KeyringTest {
 
   private static final String SERVICE = "net.east301.keyring unit test";
@@ -59,6 +63,7 @@ public class KeyringTest {
    * Test of create method, of class Keyring.
    */
   @Test
+  @RestrictiveClassloader
   public void testCreateZeroArgs() throws Exception {
     Keyring keyring = Keyring.create();
     assertNotNull(keyring);
@@ -122,7 +127,7 @@ public class KeyringTest {
    * Test of getID method, of class OSXKeychainBackend.
    */
   @Test
-  public void testGetId() {
+  public void testGetId() throws Exception {
     assertThat(new OsxKeychainBackend().getId()).isEqualTo("OSXKeychain");
   }
 

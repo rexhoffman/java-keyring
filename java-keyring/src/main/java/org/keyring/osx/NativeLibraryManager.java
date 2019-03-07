@@ -38,23 +38,29 @@ class NativeLibraryManager {
   /**
    * An instance of CoreFoundationLibrary.
    */
-  public static CoreFoundationLibrary CoreFoundation = null;
+  private final CoreFoundationLibrary coreFoundation;
 
   /**
    * An instance of SecurityLibrary.
    */
-  public static SecurityLibrary Security = null;
+  private final SecurityLibrary security;
   
-  @SuppressWarnings("deprecation")
-  public static synchronized void loadNativeLibraries() throws BackendNotSupportedException {
-    if (CoreFoundation != null && Security != null) {
-      return;
-    }
+  public NativeLibraryManager() throws BackendNotSupportedException {
     try {
-      CoreFoundation = (CoreFoundationLibrary) Native.loadLibrary("CoreFoundation", CoreFoundationLibrary.class);
-      Security = (SecurityLibrary) Native.loadLibrary("Security", SecurityLibrary.class);
+      coreFoundation = (CoreFoundationLibrary) Native.load("CoreFoundation", CoreFoundationLibrary.class);
+      security = (SecurityLibrary) Native.load("Security", SecurityLibrary.class);
     } catch (UnsatisfiedLinkError ex) {
       throw new BackendNotSupportedException("Failed to load native library");
     }
   }
+
+  public CoreFoundationLibrary getCoreFoundation() {
+    return coreFoundation;
+  }
+
+  public SecurityLibrary getSecurity() {
+    return security;
+  }
+  
+  
 }

@@ -51,13 +51,13 @@ import com.sun.jna.ptr.PointerByReference;
  */
 public class GnomeKeyringBackend extends KeyringBackend {
 
-  @Override
-  public void setup() throws BackendNotSupportedException {
-    NativeLibraryManager.loadNativeLibraries();
-
-    int result = NativeLibraryManager.gklib.gnome_keyring_unlock_sync(null, null);
+  final NativeLibraryManager libraries;
+  
+  public GnomeKeyringBackend() throws BackendNotSupportedException {
+    libraries = new NativeLibraryManager();
+    int result = libraries.getGklib().gnome_keyring_unlock_sync(null, null);
     if (result != 0) {
-      throw new BackendNotSupportedException(NativeLibraryManager.gklib.gnome_keyring_result_to_message(result));
+      throw new BackendNotSupportedException(libraries.getGklib().gnome_keyring_result_to_message(result));
     }
   }
 
@@ -101,15 +101,15 @@ public class GnomeKeyringBackend extends KeyringBackend {
       throw new PasswordRetrievalException("No password stored for this service and account.");
     }
     try {
-      int result = NativeLibraryManager.gklib.gnome_keyring_item_get_info_full_sync(null, id, 1, ptr);
+      int result = libraries.getGklib().gnome_keyring_item_get_info_full_sync(null, id, 1, ptr);
       if (result == 0) {
-        return NativeLibraryManager.gklib.gnome_keyring_item_info_get_secret(ptr.getValue());
+        return libraries.getGklib().gnome_keyring_item_info_get_secret(ptr.getValue());
       } else {
-        throw new PasswordRetrievalException(NativeLibraryManager.gklib.gnome_keyring_result_to_message(result));
+        throw new PasswordRetrievalException(libraries.getGklib().gnome_keyring_result_to_message(result));
       }
     } finally {
       if (item != null) {
-        NativeLibraryManager.gklib.gnome_keyring_item_info_free(item);
+        libraries.getGklib().gnome_keyring_item_info_free(item);
       }
     }
   }
@@ -130,10 +130,10 @@ public class GnomeKeyringBackend extends KeyringBackend {
   @Override
   public void setPassword(String service, String account, String password) throws PasswordSaveException {
     IntByReference ref = new IntByReference();
-    int result = NativeLibraryManager.gklib.gnome_keyring_set_network_password_sync(null, account, null, service, null,
+    int result = libraries.getGklib().gnome_keyring_set_network_password_sync(null, account, null, service, null,
         null, null, 0, password, ref);
     if (result != 0) {
-      throw new PasswordSaveException(NativeLibraryManager.gklib.gnome_keyring_result_to_message(result));
+      throw new PasswordSaveException(libraries.getGklib().gnome_keyring_result_to_message(result));
     }
     Map<String, Integer> map = loadMap();
     map.put(service + "/" + account, ref.getValue());

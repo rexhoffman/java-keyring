@@ -41,9 +41,10 @@ import com.sun.jna.Pointer;
  */
 public class OsxKeychainBackend extends KeyringBackend {
 
-  @Override
-  public void setup() throws BackendNotSupportedException {
-    NativeLibraryManager.loadNativeLibraries();
+  private final NativeLibraryManager nativeLibraries;
+  
+  public OsxKeychainBackend() throws BackendNotSupportedException {
+    nativeLibraries = new NativeLibraryManager();
   }
 
   /**
@@ -84,13 +85,13 @@ public class OsxKeychainBackend extends KeyringBackend {
     accountBytes = account.getBytes(charset);
     int[] dataLength = new int[1];
     Pointer[] data = new Pointer[1];
-    int status = NativeLibraryManager.Security.SecKeychainFindGenericPassword(null, serviceBytes.length, serviceBytes,
+    int status = nativeLibraries.getSecurity().SecKeychainFindGenericPassword(null, serviceBytes.length, serviceBytes,
         accountBytes.length, accountBytes, dataLength, data, null);
     if (status != 0) {
       throw new PasswordRetrievalException(convertErrorCodeToMessage(status));
     }
     byte[] passwordBytes = data[0].getByteArray(0, dataLength[0]);
-    NativeLibraryManager.Security.SecKeychainItemFreeContent(null, data[0]);
+    nativeLibraries.getSecurity().SecKeychainItemFreeContent(null, data[0]);
     return new String(passwordBytes, charset);
   }
 
@@ -117,18 +118,18 @@ public class OsxKeychainBackend extends KeyringBackend {
     accountBytes = account.getBytes(charset);
     passwordBytes = password.getBytes(charset);
     Pointer[] itemRef = new Pointer[1];
-    int status = NativeLibraryManager.Security.SecKeychainFindGenericPassword(null, serviceBytes.length, serviceBytes,
+    int status = nativeLibraries.getSecurity().SecKeychainFindGenericPassword(null, serviceBytes.length, serviceBytes,
         accountBytes.length, accountBytes, null, null, itemRef);
 
     if (status != SecurityLibrary.ERR_SEC_SUCCESS && status != SecurityLibrary.ERR_SEC_ITEM_NOT_FOUND) {
       throw new PasswordSaveException(convertErrorCodeToMessage(status));
     }
     if (itemRef[0] != null) {
-      status = NativeLibraryManager.Security.SecKeychainItemModifyContent(itemRef[0], null, passwordBytes.length,
+      status = nativeLibraries.getSecurity().SecKeychainItemModifyContent(itemRef[0], null, passwordBytes.length,
           passwordBytes);
       // TODO: add code to release itemRef[0]
     } else {
-      status = NativeLibraryManager.Security.SecKeychainAddGenericPassword(Pointer.NULL, serviceBytes.length,
+      status = nativeLibraries.getSecurity().SecKeychainAddGenericPassword(Pointer.NULL, serviceBytes.length,
           serviceBytes, accountBytes.length, accountBytes, passwordBytes.length, passwordBytes, null);
     }
     if (status != 0) {
@@ -154,14 +155,14 @@ public class OsxKeychainBackend extends KeyringBackend {
     serviceBytes = service.getBytes(charset);
     accountBytes = account.getBytes(charset);
     Pointer[] itemRef = new Pointer[1];
-    int status = NativeLibraryManager.Security.SecKeychainFindGenericPassword(null, serviceBytes.length, serviceBytes,
+    int status = nativeLibraries.getSecurity().SecKeychainFindGenericPassword(null, serviceBytes.length, serviceBytes,
         accountBytes.length, accountBytes, null, null, itemRef);
 
     if (status != SecurityLibrary.ERR_SEC_SUCCESS && status != SecurityLibrary.ERR_SEC_ITEM_NOT_FOUND) {
       throw new PasswordSaveException(convertErrorCodeToMessage(status));
     }
     if (itemRef[0] != null) {
-      status = NativeLibraryManager.Security.SecKeychainItemDelete(itemRef[0]);
+      status = nativeLibraries.getSecurity().SecKeychainItemDelete(itemRef[0]);
     }
     if (status != 0) {
       throw new PasswordSaveException(convertErrorCodeToMessage(status));
@@ -185,17 +186,16 @@ public class OsxKeychainBackend extends KeyringBackend {
    *          OSStat to be converted
    */
   private String convertErrorCodeToMessage(int errorCode) {
-    Pointer msgPtr = NativeLibraryManager.Security.SecCopyErrorMessageString(errorCode, null);
+    Pointer msgPtr = nativeLibraries.getSecurity().SecCopyErrorMessageString(errorCode, null);
     if (msgPtr == null) {
       return null;
     }
-    int bufSize = (int) NativeLibraryManager.CoreFoundation.CFStringGetLength(msgPtr);
+    int bufSize = (int) nativeLibraries.getCoreFoundation().CFStringGetLength(msgPtr);
     char[] buf = new char[bufSize];
     for (int i = 0; i < buf.length; i++) {
-      buf[i] = NativeLibraryManager.CoreFoundation.CFStringGetCharacterAtIndex(msgPtr, i);
+      buf[i] = nativeLibraries.getCoreFoundation().CFStringGetCharacterAtIndex(msgPtr, i);
     }
-    NativeLibraryManager.CoreFoundation.CFRelease(msgPtr);
+    nativeLibraries.getCoreFoundation().CFRelease(msgPtr);
     return new String(buf);
   }
-
 }
