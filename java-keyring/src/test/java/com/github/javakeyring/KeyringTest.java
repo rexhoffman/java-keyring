@@ -35,11 +35,11 @@ import static org.junit.Assert.assertNull;
 
 import java.io.File;
 
-import org.advisedtesting.classloader.RestrictiveClassloader;
-import org.advisedtesting.junit4.Junit4AopClassRunner;
 import org.junit.Test;
 import org.junit.runner.RunWith;
 
+import com.github.advisedtesting.classloader.RestrictiveClassloader;
+import com.github.advisedtesting.junit4.Junit4AopClassRunner;
 import com.sun.jna.Platform;
 
 /**

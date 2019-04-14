@@ -30,11 +30,11 @@ import static org.junit.Assert.assertNotNull;
 import static org.junit.Assert.assertTrue;
 import static org.junit.Assert.fail;
 
-import org.advisedtesting.classloader.RestrictiveClassloader;
-import org.advisedtesting.junit4.Junit4AopClassRunner;
 import org.junit.Test;
 import org.junit.runner.RunWith;
 
+import com.github.advisedtesting.classloader.RestrictiveClassloader;
+import com.github.advisedtesting.junit4.Junit4AopClassRunner;
 import com.github.javakeyring.gnome.GnomeKeyringBackend;
 import com.github.javakeyring.memory.UnencryptedMemoryBackend;
 import com.github.javakeyring.osx.OsxKeychainBackend;
