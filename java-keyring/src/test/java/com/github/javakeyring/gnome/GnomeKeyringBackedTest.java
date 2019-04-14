@@ -71,7 +71,7 @@ public class GnomeKeyringBackedTest {
   @Test
   public void testIsKeyStorePathRequired() throws Exception {
     assumeTrue(Platform.isLinux());
-    assertThat(new GnomeKeyringBackend().isKeyStorePathRequired()).isFalse();
+    assertThat(new GnomeKeyringBackend().isKeyStorePathRequired()).isTrue();
   }
 
   /**
@@ -81,6 +81,7 @@ public class GnomeKeyringBackedTest {
   public void testPasswordFlow() throws Exception {
     assumeTrue(Platform.isLinux());
     GnomeKeyringBackend backend = new GnomeKeyringBackend();
+    backend.setKeyStorePath("/path/to/keystore");
     catchThrowable(() -> backend.deletePassword(SERVICE, ACCOUNT));
     checkExistanceOfPasswordEntry(backend);
     backend.setPassword(SERVICE, ACCOUNT, PASSWORD);
