@@ -31,6 +31,8 @@ import static org.assertj.core.api.Assertions.assertThatThrownBy;
 import static org.assertj.core.api.Assertions.catchThrowable;
 import static org.junit.Assume.assumeTrue;
 
+import java.io.File;
+
 import org.junit.Test;
 
 import com.github.javakeyring.PasswordRetrievalException;
@@ -46,6 +48,10 @@ public class GnomeKeyringBackedTest {
   private static final String ACCOUNT = "testerpart2";
 
   private static final String PASSWORD = "HogeHoge2012part2";
+  
+  private static final String KEYSTORE_PREFIX = "keystore";
+
+  private static final String KEYSTORE_SUFFIX = ".keystore";
 
   /**
    * Test of setup method, of class GnomeKeyringBackend.
@@ -81,7 +87,7 @@ public class GnomeKeyringBackedTest {
   public void testPasswordFlow() throws Exception {
     assumeTrue(Platform.isLinux());
     GnomeKeyringBackend backend = new GnomeKeyringBackend();
-    backend.setKeyStorePath("/path/to/keystore");
+    backend.setKeyStorePath(File.createTempFile(KEYSTORE_PREFIX, KEYSTORE_SUFFIX).getPath());
     catchThrowable(() -> backend.deletePassword(SERVICE, ACCOUNT));
     checkExistanceOfPasswordEntry(backend);
     backend.setPassword(SERVICE, ACCOUNT, PASSWORD);
