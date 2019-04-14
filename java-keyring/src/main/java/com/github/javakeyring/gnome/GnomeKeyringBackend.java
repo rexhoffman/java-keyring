@@ -50,7 +50,7 @@ import com.sun.jna.ptr.PointerByReference;
  */
 public class GnomeKeyringBackend extends KeyringBackend {
 
-  final NativeLibraryManager libraries;
+  private final NativeLibraryManager libraries;
   
   public GnomeKeyringBackend() throws BackendNotSupportedException {
     libraries = new NativeLibraryManager();
