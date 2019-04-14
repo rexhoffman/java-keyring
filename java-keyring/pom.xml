@@ -4,7 +4,7 @@
     <modelVersion>4.0.0</modelVersion>
 
     <parent>
-        <groupId>net.east301</groupId>
+        <groupId>com.github.javakeyring</groupId>
         <artifactId>java-keyring-parent</artifactId>
         <version>1.0.1-SNAPSHOT</version>
     </parent>
@@ -16,8 +16,8 @@
     <properties>
         <github.site.location>${project.version}/${project.artifactId}</github.site.location>
         <!-- little can be done here to assert high levels of coverage due to os dependencies. -->
-        <parameter.jacoco.branch.coverage>0.20</parameter.jacoco.branch.coverage>
-        <parameter.jacoco.instruction.coverage>0.20</parameter.jacoco.instruction.coverage>
+        <parameter.jacoco.branch.coverage>0.05</parameter.jacoco.branch.coverage>
+        <parameter.jacoco.instruction.coverage>0.05</parameter.jacoco.instruction.coverage>
     </properties>
 
     <dependencies>
@@ -30,6 +30,18 @@
             <artifactId>jna-platform</artifactId>
         </dependency>
         <dependency>
+            <groupId>com.github.advisedtesting</groupId>
+            <artifactId>AdvisedJunit4</artifactId>
+            <version>1.2.6</version>
+            <scope>test</scope>
+        </dependency>
+        <dependency>
+            <groupId>com.github.advisedtesting</groupId>
+            <artifactId>AdviseStaticEvictingClassloader</artifactId>
+            <version>1.2.6</version>
+            <scope>test</scope>
+        </dependency>
+        <dependency>
             <groupId>junit</groupId>
             <artifactId>junit</artifactId>
             <scope>test</scope>
@@ -37,18 +49,6 @@
         <dependency>
             <groupId>org.assertj</groupId>
             <artifactId>assertj-core</artifactId>
-            <scope>test</scope>
-        </dependency>
-        <dependency>
-            <groupId>org.e-hoffman.testing</groupId>
-            <artifactId>AdvisedJunit4</artifactId>
-            <version>1.2.5</version>
-            <scope>test</scope>
-        </dependency>
-        <dependency>
-            <groupId>org.e-hoffman.testing</groupId>
-            <artifactId>AdviseStaticEvictingClassloader</artifactId>
-            <version>1.2.5</version>
             <scope>test</scope>
         </dependency>
     </dependencies>

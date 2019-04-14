@@ -4,7 +4,7 @@
     <modelVersion>4.0.0</modelVersion>
 
     <parent>
-        <groupId>net.east301</groupId>
+        <groupId>com.github.javakeyring</groupId>
         <artifactId>java-keyring-parent</artifactId>
         <version>1.0.1-SNAPSHOT</version>
     </parent>
@@ -20,7 +20,7 @@
 
     <dependencies>
         <dependency>
-            <groupId>net.east301</groupId>
+            <groupId>${project.groupId}</groupId>
             <artifactId>java-keyring</artifactId>
             <version>${project.version}</version>
         </dependency>

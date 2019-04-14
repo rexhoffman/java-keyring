@@ -5,10 +5,10 @@
     <parent>
         <groupId>com.salesforce.maven</groupId>
         <artifactId>MavenParent</artifactId>
-        <version>1.0.9</version>
+        <version>1.0.11</version>
     </parent>
 
-    <groupId>net.east301</groupId>
+    <groupId>com.github.javakeyring</groupId>
     <artifactId>java-keyring-parent</artifactId>
     <version>1.0.1-SNAPSHOT</version>
     <packaging>pom</packaging>
@@ -21,16 +21,15 @@
     </modules>
 
     <properties>
-        <github.owner>rexhoffman</github.owner>
+        <github.owner>javakeyring</github.owner>
         <github.project>java-keyring</github.project>
         <github.site.location>${project.version}/</github.site.location>
         <!-- set the below parameter to false once you've cut your first release and you want semantic verion checking -->
         <parameter.disable.semantic.versioning>true</parameter.disable.semantic.versioning>
         <parameter.license>BSD-3</parameter.license>
         <parameter.organization.email>rex@e-hoffman.org</parameter.organization.email>
-        <parameter.organization.name>Rex Hoffman</parameter.organization.name>
+        <parameter.organization.name>Java Keyring</parameter.organization.name>
     </properties>
-
     <dependencyManagement>
         <dependencies>
             <dependency>
@@ -55,10 +54,10 @@
             </dependency>
         </dependencies>
     </dependencyManagement>
-
+    <inceptionYear>2019</inceptionYear>
     <organization>
-        <name>e-hoffman.org</name>
-        <url>https://github.com/rexhoffman/</url>
+        <name>${parameter.organization.name}</name>
+        <url>https://github.com/javakeyring/</url>
     </organization>
     <licenses>
         <license>
