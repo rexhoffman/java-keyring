@@ -1,0 +1,154 @@
+<?xml version="1.0" encoding="UTF-8"?><!DOCTYPE html PUBLIC "-//W3C//DTD XHTML 1.0 Strict//EN" "http://www.w3.org/TR/xhtml1/DTD/xhtml1-strict.dtd"><html xmlns="http://www.w3.org/1999/xhtml" lang="en"><head><meta http-equiv="Content-Type" content="text/html;charset=UTF-8"/><link rel="stylesheet" href="../../jacoco-resources/report.css" type="text/css"/><link rel="shortcut icon" href="../../jacoco-resources/report.gif" type="image/gif"/><title>Keyring.java</title><link rel="stylesheet" href="../../jacoco-resources/prettify.css" type="text/css"/><script type="text/javascript" src="../../jacoco-resources/prettify.js"></script></head><body onload="window['PR_TAB_WIDTH']=4;prettyPrint()"><div class="breadcrumb" id="breadcrumb"><span class="info"><a href="../../jacoco-sessions.html" class="el_session">Sessions</a></span><a href="../../index.html" class="el_report">java-keyring-example</a> &gt; <a href="../index.html" class="el_bundle">java-keyring</a> &gt; <a href="index.source.html" class="el_package">com.github.javakeyring</a> &gt; <span class="el_source">Keyring.java</span></div><h1>Keyring.java</h1><pre class="source lang-java linenums">/*
+ * Copyright © 2019, Java Keyring
+ * All rights reserved.
+ *
+ * Redistribution and use in source and binary forms, with or without
+ * modification, are permitted provided that the following conditions are met:
+ *     * Redistributions of source code must retain the above copyright
+ *       notice, this list of conditions and the following disclaimer.
+ *     * Redistributions in binary form must reproduce the above copyright
+ *       notice, this list of conditions and the following disclaimer in the
+ *       documentation and/or other materials provided with the distribution.
+ *     * Neither the name of the &lt;organization&gt; nor the
+ *       names of its contributors may be used to endorse or promote products
+ *       derived from this software without specific prior written permission.
+ *
+ * THIS SOFTWARE IS PROVIDED BY THE COPYRIGHT HOLDERS AND CONTRIBUTORS &quot;AS IS&quot; AND
+ * ANY EXPRESS OR IMPLIED WARRANTIES, INCLUDING, BUT NOT LIMITED TO, THE IMPLIED
+ * WARRANTIES OF MERCHANTABILITY AND FITNESS FOR A PARTICULAR PURPOSE ARE
+ * DISCLAIMED. IN NO EVENT SHALL &lt;COPYRIGHT HOLDER&gt; BE LIABLE FOR ANY
+ * DIRECT, INDIRECT, INCIDENTAL, SPECIAL, EXEMPLARY, OR CONSEQUENTIAL DAMAGES
+ * (INCLUDING, BUT NOT LIMITED TO, PROCUREMENT OF SUBSTITUTE GOODS OR SERVICES;
+ * LOSS OF USE, DATA, OR PROFITS; OR BUSINESS INTERRUPTION) HOWEVER CAUSED AND
+ * ON ANY THEORY OF LIABILITY, WHETHER IN CONTRACT, STRICT LIABILITY, OR TORT
+ * (INCLUDING NEGLIGENCE OR OTHERWISE) ARISING IN ANY WAY OUT OF THE USE OF THIS
+ * SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
+ */
+package com.github.javakeyring;
+
+import com.github.javakeyring.util.LockException;
+
+/**
+ * Keyring.
+ */
+public class Keyring {
+
+  /**
+   * Keyring backend.
+   */
+  private KeyringBackend backend;
+  
+  /**
+   * Creates an instance of Keyring using the a default backed based on operating system.
+   * 
+   * @return a functional Keyring or a BackendNotSupportedException is thrown.
+   * @throws BackendNotSupportedException if the default backend for the operating system is unsupported.
+   */
+  public static Keyring create() throws BackendNotSupportedException {
+<span class="nc" id="L48">    return new Keyring(KeyringBackendFactory.create());</span>
+  }
+
+  /**
+   * Creates an instance of Keyring with specified backend.
+   *
+   * @param keyring desired backend.
+   * @return a functional Keyring or a BackendNotSupportedException is thrown.
+   * @throws BackendNotSupportedException if the default backend for the operating system is unsupported.
+   */
+  public static Keyring create(Keyrings keyring) throws BackendNotSupportedException {
+<span class="nc" id="L59">    return new Keyring(KeyringBackendFactory.create(keyring));</span>
+  }
+
+  /**
+   * Initializes an instance of Keyring.
+   *
+   * @param backend Keyring backend instance
+   */
+<span class="nc" id="L67">  private Keyring(KeyringBackend backend) {</span>
+<span class="nc" id="L68">    this.backend = backend;</span>
+<span class="nc" id="L69">  }</span>
+
+  /**
+   * Gets path to key store (Proxy method of KeyringBackend.getKeyStorePath).
+   * 
+   * @return path to the keystore.
+   */
+  public String getKeyStorePath() {
+<span class="nc" id="L77">    return backend.getKeyStorePath();</span>
+  }
+
+  /**
+   * Sets path to key store (Proxy method of KeyringBackend.setKeyStorePath).
+   *
+   * @param path Path to key store
+   */
+  public void setKeyStorePath(String path) {
+<span class="nc" id="L86">    backend.setKeyStorePath(path);</span>
+<span class="nc" id="L87">  }</span>
+
+  /**
+   * Returns true if the backend directory uses some file to store passwords.
+   * (Proxy method of KeyringBackend.isKeyStorePathRequired)
+   * 
+   * @return if a path is required to store a password.
+   */
+  public boolean isKeyStorePathRequired() {
+<span class="nc" id="L96">    return backend.isKeyStorePathRequired();</span>
+  }
+
+  /**
+   * Gets password from key store (Proxy method of KeyringBackend.getPassword).
+   *
+   * @param service
+   *          Service name
+   * @param account
+   *          Account name
+   *
+   * @return Password related to specified service and account
+   *
+   * @throws PasswordRetrievalException
+   *           Thrown when an error happened while getting password
+   * @throws LockException
+   *           can't establish lock.
+   */
+  public String getPassword(String service, String account) throws LockException, PasswordRetrievalException {
+<span class="nc" id="L115">    return backend.getPassword(service, account);</span>
+  }
+
+  /**
+   * Sets password to key store (Proxy method of KeyringBackend.setPassword)
+   *
+   * @param service
+   *          Service name
+   * @param account
+   *          Account name
+   * @param password
+   *          Password
+   *
+   * @throws PasswordSaveException
+   *           Thrown when an error happened while saving the password
+   * @throws LockException
+   *           can't establish lock.
+   */
+  public void setPassword(String service, String account, String password) throws LockException, PasswordSaveException {
+<span class="nc" id="L134">    backend.setPassword(service, account, password);</span>
+<span class="nc" id="L135">  }</span>
+  
+  /**
+   * Sets password to key store (Proxy method of KeyringBackend.setPassword)
+   *
+   * @param service
+   *          Service name
+   * @param account
+   *          Account name
+   *
+   * @throws PasswordSaveException
+   *           Thrown when an error happened while saving the password
+   * @throws LockException
+   *           can't establish lock.
+   */
+  public void deletePassword(String service, String account) throws LockException, PasswordSaveException {
+<span class="nc" id="L151">    backend.deletePassword(service, account);</span>
+<span class="nc" id="L152">  }</span>
+}
+</pre><div class="footer"><span class="right">Created with <a href="http://www.jacoco.org/jacoco">JaCoCo</a> 0.8.3.201901230119</span></div></body></html>
