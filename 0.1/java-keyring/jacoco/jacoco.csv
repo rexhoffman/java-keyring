@@ -1,0 +1,17 @@
+GROUP,PACKAGE,CLASS,INSTRUCTION_MISSED,INSTRUCTION_COVERED,BRANCH_MISSED,BRANCH_COVERED,LINE_MISSED,LINE_COVERED,COMPLEXITY_MISSED,COMPLEXITY_COVERED,METHOD_MISSED,METHOD_COVERED
+java-keyring,com.github.javakeyring,KeyringBackend,0,10,0,0,0,4,0,3,0,3
+java-keyring,com.github.javakeyring,Keyrings,59,0,0,0,9,0,3,0,3,0
+java-keyring,com.github.javakeyring,KeyringBackendFactory,71,0,8,0,19,0,8,0,4,0
+java-keyring,com.github.javakeyring,PasswordSaveException,0,4,0,0,0,2,0,1,0,1
+java-keyring,com.github.javakeyring,PasswordRetrievalException,0,4,0,0,0,2,0,1,0,1
+java-keyring,com.github.javakeyring,BackendNotSupportedException,4,0,0,0,2,0,1,0,1,0
+java-keyring,com.github.javakeyring,Keyring,49,0,0,0,14,0,9,0,9,0
+java-keyring,com.github.javakeyring.osx,OsxKeychainBackend,36,243,6,16,7,51,6,13,0,8
+java-keyring,com.github.javakeyring.osx,NativeLibraryManager,6,22,0,0,1,7,0,3,0,3
+java-keyring,com.github.javakeyring.memory,UnencryptedMemoryBackend,44,105,10,6,9,21,8,8,1,7
+java-keyring,com.github.javakeyring.gnome,GnomeKeyringBackend,245,0,14,0,51,0,16,0,9,0
+java-keyring,com.github.javakeyring.gnome,NativeLibraryManager,28,0,0,0,8,0,3,0,3,0
+java-keyring,com.github.javakeyring.windows,WindowsDpApiBackend,287,0,12,0,76,0,19,0,13,0
+java-keyring,com.github.javakeyring.windows,PasswordEntry,33,0,0,0,14,0,7,0,7,0
+java-keyring,com.github.javakeyring.util,LockException,5,0,0,0,2,0,1,0,1,0
+java-keyring,com.github.javakeyring.util,FileBasedLock,106,0,14,0,25,0,11,0,4,0

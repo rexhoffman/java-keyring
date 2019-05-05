@@ -1,0 +1,201 @@
+<?xml version="1.0" encoding="UTF-8"?><!DOCTYPE html PUBLIC "-//W3C//DTD XHTML 1.0 Strict//EN" "http://www.w3.org/TR/xhtml1/DTD/xhtml1-strict.dtd"><html xmlns="http://www.w3.org/1999/xhtml" lang="en"><head><meta http-equiv="Content-Type" content="text/html;charset=UTF-8"/><link rel="stylesheet" href="../jacoco-resources/report.css" type="text/css"/><link rel="shortcut icon" href="../jacoco-resources/report.gif" type="image/gif"/><title>OsxKeychainBackend.java</title><link rel="stylesheet" href="../jacoco-resources/prettify.css" type="text/css"/><script type="text/javascript" src="../jacoco-resources/prettify.js"></script></head><body onload="window['PR_TAB_WIDTH']=4;prettyPrint()"><div class="breadcrumb" id="breadcrumb"><span class="info"><a href="../jacoco-sessions.html" class="el_session">Sessions</a></span><a href="../index.html" class="el_report">java-keyring</a> &gt; <a href="index.source.html" class="el_package">com.github.javakeyring.osx</a> &gt; <span class="el_source">OsxKeychainBackend.java</span></div><h1>OsxKeychainBackend.java</h1><pre class="source lang-java linenums">/*
+ * Copyright © 2019, Java Keyring
+ * All rights reserved.
+ *
+ * Redistribution and use in source and binary forms, with or without
+ * modification, are permitted provided that the following conditions are met:
+ *     * Redistributions of source code must retain the above copyright
+ *       notice, this list of conditions and the following disclaimer.
+ *     * Redistributions in binary form must reproduce the above copyright
+ *       notice, this list of conditions and the following disclaimer in the
+ *       documentation and/or other materials provided with the distribution.
+ *     * Neither the name of the &lt;organization&gt; nor the
+ *       names of its contributors may be used to endorse or promote products
+ *       derived from this software without specific prior written permission.
+ *
+ * THIS SOFTWARE IS PROVIDED BY THE COPYRIGHT HOLDERS AND CONTRIBUTORS &quot;AS IS&quot; AND
+ * ANY EXPRESS OR IMPLIED WARRANTIES, INCLUDING, BUT NOT LIMITED TO, THE IMPLIED
+ * WARRANTIES OF MERCHANTABILITY AND FITNESS FOR A PARTICULAR PURPOSE ARE
+ * DISCLAIMED. IN NO EVENT SHALL &lt;COPYRIGHT HOLDER&gt; BE LIABLE FOR ANY
+ * DIRECT, INDIRECT, INCIDENTAL, SPECIAL, EXEMPLARY, OR CONSEQUENTIAL DAMAGES
+ * (INCLUDING, BUT NOT LIMITED TO, PROCUREMENT OF SUBSTITUTE GOODS OR SERVICES;
+ * LOSS OF USE, DATA, OR PROFITS; OR BUSINESS INTERRUPTION) HOWEVER CAUSED AND
+ * ON ANY THEORY OF LIABILITY, WHETHER IN CONTRACT, STRICT LIABILITY, OR TORT
+ * (INCLUDING NEGLIGENCE OR OTHERWISE) ARISING IN ANY WAY OUT OF THE USE OF THIS
+ * SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
+ */
+package com.github.javakeyring.osx;
+
+import java.nio.charset.Charset;
+
+import com.github.javakeyring.BackendNotSupportedException;
+import com.github.javakeyring.KeyringBackend;
+import com.github.javakeyring.PasswordRetrievalException;
+import com.github.javakeyring.PasswordSaveException;
+import com.sun.jna.Platform;
+import com.sun.jna.Pointer;
+
+/**
+ * Keyring backend which uses OS X Keychain.
+ */
+public class OsxKeychainBackend extends KeyringBackend {
+
+  private final NativeLibraryManager nativeLibraries;
+  
+<span class="fc" id="L45">  public OsxKeychainBackend() throws BackendNotSupportedException {</span>
+<span class="fc" id="L46">    nativeLibraries = new NativeLibraryManager();</span>
+<span class="fc" id="L47">  }</span>
+
+  /**
+   * Returns true when the backend is supported.
+   */
+  @Override
+  public boolean isSupported() {
+<span class="fc" id="L54">    return Platform.isMac();</span>
+  }
+
+  /**
+   * Returns true if the backend directory uses some file to store passwords.
+   */
+  @Override
+  public boolean isKeyStorePathRequired() {
+<span class="fc" id="L62">    return false;</span>
+  }
+
+  /**
+   * Gets password from key store.
+   *
+   * @param service
+   *          Service name
+   * @param account
+   *          Account name
+   *
+   * @return Password related to specified service and account
+   *
+   * @throws PasswordRetrievalException
+   *           Thrown when an error happened while getting password
+   */
+  @Override
+  public String getPassword(String service, String account) throws PasswordRetrievalException {
+    byte[] serviceBytes;
+    byte[] accountBytes;
+<span class="fc" id="L82">    Charset charset = Charset.forName(&quot;UTF-8&quot;);</span>
+<span class="fc" id="L83">    serviceBytes = service.getBytes(charset);</span>
+<span class="fc" id="L84">    accountBytes = account.getBytes(charset);</span>
+<span class="fc" id="L85">    int[] dataLength = new int[1];</span>
+<span class="fc" id="L86">    Pointer[] data = new Pointer[1];</span>
+<span class="fc" id="L87">    int status = nativeLibraries.getSecurity().SecKeychainFindGenericPassword(null, serviceBytes.length, serviceBytes,</span>
+<span class="fc" id="L88">        accountBytes.length, accountBytes, dataLength, data, null);</span>
+<span class="fc bfc" id="L89" title="All 2 branches covered.">    if (status != 0) {</span>
+<span class="fc" id="L90">      throw new PasswordRetrievalException(convertErrorCodeToMessage(status));</span>
+    }
+<span class="fc" id="L92">    byte[] passwordBytes = data[0].getByteArray(0, dataLength[0]);</span>
+<span class="fc" id="L93">    nativeLibraries.getSecurity().SecKeychainItemFreeContent(null, data[0]);</span>
+<span class="fc" id="L94">    return new String(passwordBytes, charset);</span>
+  }
+
+  /**
+   * Sets password to key store.
+   *
+   * @param service
+   *          Service name
+   * @param account
+   *          Account name
+   * @param password
+   *          Password
+   *
+   * @throws PasswordSaveException
+   *           Thrown when an error happened while saving the password
+   */
+  @Override
+  public void setPassword(String service, String account, String password) throws PasswordSaveException {
+    byte[] serviceBytes;
+    byte[] accountBytes;
+    byte[] passwordBytes;
+<span class="fc" id="L115">    Charset charset = Charset.forName(&quot;UTF-8&quot;);</span>
+<span class="fc" id="L116">    serviceBytes = service.getBytes(charset);</span>
+<span class="fc" id="L117">    accountBytes = account.getBytes(charset);</span>
+<span class="fc" id="L118">    passwordBytes = password.getBytes(charset);</span>
+<span class="fc" id="L119">    Pointer[] itemRef = new Pointer[1];</span>
+<span class="fc" id="L120">    int status = nativeLibraries.getSecurity().SecKeychainFindGenericPassword(null, serviceBytes.length, serviceBytes,</span>
+<span class="fc" id="L121">        accountBytes.length, accountBytes, null, null, itemRef);</span>
+
+<span class="pc bpc" id="L123" title="2 of 4 branches missed.">    if (status != SecurityLibrary.ERR_SEC_SUCCESS &amp;&amp; status != SecurityLibrary.ERR_SEC_ITEM_NOT_FOUND) {</span>
+<span class="nc" id="L124">      throw new PasswordSaveException(convertErrorCodeToMessage(status));</span>
+    }
+<span class="pc bpc" id="L126" title="1 of 2 branches missed.">    if (itemRef[0] != null) {</span>
+<span class="nc" id="L127">      status = nativeLibraries.getSecurity().SecKeychainItemModifyContent(itemRef[0], null, passwordBytes.length,</span>
+<span class="nc" id="L128">          passwordBytes);</span>
+      // TODO: add code to release itemRef[0]
+<span class="nc" id="L130">    } else {</span>
+<span class="fc" id="L131">      status = nativeLibraries.getSecurity().SecKeychainAddGenericPassword(Pointer.NULL, serviceBytes.length,</span>
+<span class="fc" id="L132">          serviceBytes, accountBytes.length, accountBytes, passwordBytes.length, passwordBytes, null);</span>
+    }
+<span class="pc bpc" id="L134" title="1 of 2 branches missed.">    if (status != 0) {</span>
+<span class="nc" id="L135">      throw new PasswordSaveException(convertErrorCodeToMessage(status));</span>
+    }
+<span class="fc" id="L137">  }</span>
+
+  /**
+   * Delete a password from the key store.
+   *
+   * @param service
+   *          Service name
+   * @param account
+   *          Account name
+   *
+   * @throws PasswordSaveException
+   *           Thrown when an error happened while saving the password
+   */
+  public void deletePassword(String service, String account) throws PasswordSaveException {
+    byte[] serviceBytes;
+    byte[] accountBytes;
+<span class="fc" id="L153">    Charset charset = Charset.forName(&quot;UTF-8&quot;);</span>
+<span class="fc" id="L154">    serviceBytes = service.getBytes(charset);</span>
+<span class="fc" id="L155">    accountBytes = account.getBytes(charset);</span>
+<span class="fc" id="L156">    Pointer[] itemRef = new Pointer[1];</span>
+<span class="fc" id="L157">    int status = nativeLibraries.getSecurity().SecKeychainFindGenericPassword(null, serviceBytes.length, serviceBytes,</span>
+<span class="fc" id="L158">        accountBytes.length, accountBytes, null, null, itemRef);</span>
+
+<span class="pc bpc" id="L160" title="1 of 4 branches missed.">    if (status != SecurityLibrary.ERR_SEC_SUCCESS &amp;&amp; status != SecurityLibrary.ERR_SEC_ITEM_NOT_FOUND) {</span>
+<span class="nc" id="L161">      throw new PasswordSaveException(convertErrorCodeToMessage(status));</span>
+    }
+<span class="fc bfc" id="L163" title="All 2 branches covered.">    if (itemRef[0] != null) {</span>
+<span class="fc" id="L164">      status = nativeLibraries.getSecurity().SecKeychainItemDelete(itemRef[0]);</span>
+    }
+<span class="fc bfc" id="L166" title="All 2 branches covered.">    if (status != 0) {</span>
+<span class="fc" id="L167">      throw new PasswordSaveException(convertErrorCodeToMessage(status));</span>
+    }
+<span class="fc" id="L169">  }  </span>
+  
+  
+  
+  /**
+   * Gets backend ID.
+   */
+  @Override
+  public String getId() {
+<span class="fc" id="L178">    return &quot;OSXKeychain&quot;;</span>
+  }
+
+  /**
+   * Converts OSStat to error message.
+   *
+   * @param errorCode
+   *          OSStat to be converted
+   */
+  private String convertErrorCodeToMessage(int errorCode) {
+<span class="fc" id="L188">    Pointer msgPtr = nativeLibraries.getSecurity().SecCopyErrorMessageString(errorCode, null);</span>
+<span class="pc bpc" id="L189" title="1 of 2 branches missed.">    if (msgPtr == null) {</span>
+<span class="nc" id="L190">      return null;</span>
+    }
+<span class="fc" id="L192">    int bufSize = (int) nativeLibraries.getCoreFoundation().CFStringGetLength(msgPtr);</span>
+<span class="fc" id="L193">    char[] buf = new char[bufSize];</span>
+<span class="fc bfc" id="L194" title="All 2 branches covered.">    for (int i = 0; i &lt; buf.length; i++) {</span>
+<span class="fc" id="L195">      buf[i] = nativeLibraries.getCoreFoundation().CFStringGetCharacterAtIndex(msgPtr, i);</span>
+    }
+<span class="fc" id="L197">    nativeLibraries.getCoreFoundation().CFRelease(msgPtr);</span>
+<span class="fc" id="L198">    return new String(buf);</span>
+  }
+}
+</pre><div class="footer"><span class="right">Created with <a href="http://www.jacoco.org/jacoco">JaCoCo</a> 0.8.3.201901230119</span></div></body></html>

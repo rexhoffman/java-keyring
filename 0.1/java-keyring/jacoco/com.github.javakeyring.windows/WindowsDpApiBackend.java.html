@@ -1,0 +1,277 @@
+<?xml version="1.0" encoding="UTF-8"?><!DOCTYPE html PUBLIC "-//W3C//DTD XHTML 1.0 Strict//EN" "http://www.w3.org/TR/xhtml1/DTD/xhtml1-strict.dtd"><html xmlns="http://www.w3.org/1999/xhtml" lang="en"><head><meta http-equiv="Content-Type" content="text/html;charset=UTF-8"/><link rel="stylesheet" href="../jacoco-resources/report.css" type="text/css"/><link rel="shortcut icon" href="../jacoco-resources/report.gif" type="image/gif"/><title>WindowsDpApiBackend.java</title><link rel="stylesheet" href="../jacoco-resources/prettify.css" type="text/css"/><script type="text/javascript" src="../jacoco-resources/prettify.js"></script></head><body onload="window['PR_TAB_WIDTH']=4;prettyPrint()"><div class="breadcrumb" id="breadcrumb"><span class="info"><a href="../jacoco-sessions.html" class="el_session">Sessions</a></span><a href="../index.html" class="el_report">java-keyring</a> &gt; <a href="index.source.html" class="el_package">com.github.javakeyring.windows</a> &gt; <span class="el_source">WindowsDpApiBackend.java</span></div><h1>WindowsDpApiBackend.java</h1><pre class="source lang-java linenums">/*
+ * Copyright © 2019, Java Keyring
+ * All rights reserved.
+ *
+ * Redistribution and use in source and binary forms, with or without
+ * modification, are permitted provided that the following conditions are met:
+ *     * Redistributions of source code must retain the above copyright
+ *       notice, this list of conditions and the following disclaimer.
+ *     * Redistributions in binary form must reproduce the above copyright
+ *       notice, this list of conditions and the following disclaimer in the
+ *       documentation and/or other materials provided with the distribution.
+ *     * Neither the name of the &lt;organization&gt; nor the
+ *       names of its contributors may be used to endorse or promote products
+ *       derived from this software without specific prior written permission.
+ *
+ * THIS SOFTWARE IS PROVIDED BY THE COPYRIGHT HOLDERS AND CONTRIBUTORS &quot;AS IS&quot; AND
+ * ANY EXPRESS OR IMPLIED WARRANTIES, INCLUDING, BUT NOT LIMITED TO, THE IMPLIED
+ * WARRANTIES OF MERCHANTABILITY AND FITNESS FOR A PARTICULAR PURPOSE ARE
+ * DISCLAIMED. IN NO EVENT SHALL &lt;COPYRIGHT HOLDER&gt; BE LIABLE FOR ANY
+ * DIRECT, INDIRECT, INCIDENTAL, SPECIAL, EXEMPLARY, OR CONSEQUENTIAL DAMAGES
+ * (INCLUDING, BUT NOT LIMITED TO, PROCUREMENT OF SUBSTITUTE GOODS OR SERVICES;
+ * LOSS OF USE, DATA, OR PROFITS; OR BUSINESS INTERRUPTION) HOWEVER CAUSED AND
+ * ON ANY THEORY OF LIABILITY, WHETHER IN CONTRACT, STRICT LIABILITY, OR TORT
+ * (INCLUDING NEGLIGENCE OR OTHERWISE) ARISING IN ANY WAY OUT OF THE USE OF THIS
+ * SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
+ */
+package com.github.javakeyring.windows;
+
+import java.io.FileInputStream;
+import java.io.FileOutputStream;
+import java.io.ObjectInputStream;
+import java.io.ObjectOutputStream;
+import java.io.UnsupportedEncodingException;
+import java.util.ArrayList;
+import java.util.Arrays;
+import java.util.List;
+import java.util.logging.Level;
+import java.util.logging.Logger;
+
+import com.github.javakeyring.KeyringBackend;
+import com.github.javakeyring.PasswordRetrievalException;
+import com.github.javakeyring.PasswordSaveException;
+import com.github.javakeyring.util.FileBasedLock;
+import com.github.javakeyring.util.LockException;
+import com.sun.jna.Platform;
+import com.sun.jna.platform.win32.Crypt32Util;
+
+/**
+ * Keyring backend which uses Windows DPAPI.
+ */
+<span class="nc" id="L51">public class WindowsDpApiBackend extends KeyringBackend {</span>
+
+  /**
+   * Returns true when the backend is supported.
+   */
+  @Override
+  public boolean isSupported() {
+<span class="nc" id="L58">    return Platform.isWindows();</span>
+  }
+
+  /**
+   * Returns true if the backend directory uses some file to store passwords.
+   */
+  @Override
+  public boolean isKeyStorePathRequired() {
+<span class="nc" id="L66">    return true;</span>
+  }
+
+  /**
+   * Gets password from key store.
+   *
+   * @param service
+   *          Service name
+   * @param account
+   *          Account name
+   *
+   * @return Password related to specified service and account
+   *
+   * @throws PasswordRetrievalException
+   *           Thrown when an error happened while getting password
+   */
+  @Override
+  public String getPassword(String service, String account) throws LockException, PasswordRetrievalException {
+
+<span class="nc" id="L85">    FileBasedLock fileLock = new FileBasedLock(getLockPath());</span>
+
+    try {
+<span class="nc" id="L88">      fileLock.lock();</span>
+<span class="nc" id="L89">      PasswordEntry targetEntry = findEntry(service, account, loadPasswordEntries());</span>
+<span class="nc bnc" id="L90" title="All 2 branches missed.">      if (targetEntry == null) {</span>
+<span class="nc" id="L91">        throw new PasswordRetrievalException(&quot;Password related to the specified service and account is not found&quot;);</span>
+      }
+<span class="nc" id="L93">      return decryptPassword(targetEntry);</span>
+    } finally {
+      try {
+<span class="nc" id="L96">        fileLock.release();</span>
+<span class="nc" id="L97">      } catch (Exception ex) {</span>
+<span class="nc" id="L98">        Logger.getLogger(WindowsDpApiBackend.class.getName()).log(Level.SEVERE, null, ex);</span>
+      }
+    }
+  }
+
+  private String decryptPassword(PasswordEntry targetEntry) throws PasswordRetrievalException {
+    byte[] decryptedBytes;
+    try {
+<span class="nc" id="L106">      decryptedBytes = Crypt32Util.cryptUnprotectData(targetEntry.getPassword());</span>
+<span class="nc" id="L107">    } catch (Exception ex) {</span>
+<span class="nc" id="L108">      throw new PasswordRetrievalException(&quot;Failed to decrypt password&quot;);</span>
+    }
+    try {
+<span class="nc" id="L111">      return new String(decryptedBytes, &quot;UTF-8&quot;);</span>
+<span class="nc" id="L112">    } catch (UnsupportedEncodingException ex) {</span>
+<span class="nc" id="L113">      throw new PasswordRetrievalException(&quot;Unsupported encoding 'UTF-8' specified&quot;);</span>
+    }
+  }
+
+  /**
+   * Sets password to key store.
+   *
+   * @param service
+   *          Service name
+   * @param account
+   *          Account name
+   * @param password
+   *          Password
+   *
+   * @throws PasswordSaveException
+   *           Thrown when an error happened while saving the password
+   */
+  @Override
+  public void setPassword(String service, String account, String password) throws LockException, PasswordSaveException {
+
+<span class="nc" id="L133">    FileBasedLock fileLock = new FileBasedLock(getLockPath());</span>
+
+    try {
+<span class="nc" id="L136">      fileLock.lock();</span>
+<span class="nc" id="L137">      List&lt;PasswordEntry&gt; entries = loadPasswordEntries();</span>
+<span class="nc" id="L138">      PasswordEntry targetEntry = findEntry(service, account, entries);</span>
+<span class="nc" id="L139">      final byte[] encryptedBytes = encryptPassword(password);</span>
+<span class="nc bnc" id="L140" title="All 2 branches missed.">      if (targetEntry != null) {</span>
+<span class="nc" id="L141">        targetEntry.setPassword(encryptedBytes);</span>
+<span class="nc" id="L142">      } else {</span>
+<span class="nc" id="L143">        entries.add(new PasswordEntry(service, account, encryptedBytes));</span>
+      }
+<span class="nc" id="L145">      savePasswordEntries(entries);</span>
+<span class="nc" id="L146">    } finally {</span>
+      try {
+<span class="nc" id="L148">        fileLock.release();</span>
+<span class="nc" id="L149">      } catch (Exception ex) {</span>
+<span class="nc" id="L150">        Logger.getLogger(WindowsDpApiBackend.class.getName()).log(Level.SEVERE, null, ex);</span>
+      }
+    }
+<span class="nc" id="L153">  }</span>
+
+  private byte[] encryptPassword(String password) throws PasswordSaveException {
+    byte[] encryptedBytes;
+
+    try {
+<span class="nc" id="L159">      encryptedBytes = Crypt32Util.cryptProtectData(password.getBytes(&quot;UTF-8&quot;));</span>
+<span class="nc" id="L160">    } catch (UnsupportedEncodingException ex) {</span>
+<span class="nc" id="L161">      throw new PasswordSaveException(&quot;Unsupported encoding 'UTF-8' specified&quot;);</span>
+<span class="nc" id="L162">    } catch (Exception ex) {</span>
+<span class="nc" id="L163">      throw new PasswordSaveException(&quot;Failed to encrypt password&quot;);</span>
+    }
+
+    //
+<span class="nc" id="L167">    return encryptedBytes;</span>
+  }
+
+  /**
+   * Deletes password from the key store.
+   *
+   * @param service
+   *          Service name
+   * @param account
+   *          Account name
+   *
+   * @throws PasswordSaveException
+   *           Thrown when an error happened while saving the password
+   */
+  @Override
+  public void deletePassword(String service, String account) throws LockException, PasswordSaveException {
+
+<span class="nc" id="L184">    FileBasedLock fileLock = new FileBasedLock(getLockPath());</span>
+
+    try {
+<span class="nc" id="L187">      fileLock.lock();</span>
+<span class="nc" id="L188">      List&lt;PasswordEntry&gt; entries = loadPasswordEntries();</span>
+<span class="nc" id="L189">      PasswordEntry targetEntry = findEntry(service, account, entries);</span>
+<span class="nc bnc" id="L190" title="All 2 branches missed.">      if (targetEntry != null) {</span>
+<span class="nc" id="L191">        entries.remove(targetEntry);</span>
+      }
+<span class="nc" id="L193">      savePasswordEntries(entries);</span>
+<span class="nc" id="L194">    } finally {</span>
+      try {
+<span class="nc" id="L196">        fileLock.release();</span>
+<span class="nc" id="L197">      } catch (Exception ex) {</span>
+<span class="nc" id="L198">        Logger.getLogger(WindowsDpApiBackend.class.getName()).log(Level.SEVERE, null, ex);</span>
+      }
+    }
+<span class="nc" id="L201">  }</span>
+
+  private PasswordEntry findEntry(String service, String account, List&lt;PasswordEntry&gt; entries) {
+<span class="nc" id="L204">    PasswordEntry targetEntry = null;</span>
+<span class="nc bnc" id="L205" title="All 2 branches missed.">    for (PasswordEntry entry : entries) {</span>
+<span class="nc bnc" id="L206" title="All 4 branches missed.">      if (entry.getService().equals(service) &amp;&amp; entry.getAccount().equals(account)) {</span>
+<span class="nc" id="L207">        targetEntry = entry;</span>
+<span class="nc" id="L208">        break;</span>
+      }
+    }
+<span class="nc" id="L211">    return targetEntry;</span>
+  }  
+  
+  
+  /**
+   * Gets backend ID.
+   */
+  @Override
+  public String getId() {
+<span class="nc" id="L220">    return &quot;WindowsDPAPI&quot;;</span>
+  }
+
+  /**
+   * Returns path to a file for lock.
+   * 
+   * @return the key store lock file location.
+   */
+  public String getLockPath() {
+<span class="nc" id="L229">    return keyStorePath + &quot;.lock&quot;;</span>
+  }
+
+  /**
+   * Loads password entries to a file. This method is not thread/process safe.
+   */
+  private List&lt;PasswordEntry&gt; loadPasswordEntries() {
+<span class="nc" id="L236">    ArrayList&lt;PasswordEntry&gt; entries = new ArrayList&lt;&gt;();</span>
+
+    try {
+<span class="nc" id="L239">      ObjectInputStream fin = new ObjectInputStream(new FileInputStream(keyStorePath));</span>
+      try {
+<span class="nc" id="L241">        entries.addAll(Arrays.asList((PasswordEntry[]) fin.readObject()));</span>
+<span class="nc" id="L242">      } finally {</span>
+<span class="nc" id="L243">        fin.close();</span>
+      }
+<span class="nc" id="L245">    } catch (Exception ex) {</span>
+<span class="nc" id="L246">      Logger.getLogger(WindowsDpApiBackend.class.getName()).log(Level.SEVERE, null, ex);</span>
+    }
+
+<span class="nc" id="L249">    return entries;</span>
+  }
+
+  /**
+   * Saves password entries to a file This method is not thread/process safe.
+   *
+   * @param entries
+   *          Password entries to be saved
+   *
+   * @throws PasswordSaveException
+   *           Thrown when an error happened while writing to a file
+   */
+  private void savePasswordEntries(List&lt;PasswordEntry&gt; entries) throws PasswordSaveException {
+
+    try {
+<span class="nc" id="L264">      ObjectOutputStream fout = new ObjectOutputStream(new FileOutputStream(keyStorePath));</span>
+      try {
+<span class="nc" id="L266">        fout.writeObject(entries.toArray(new PasswordEntry[0]));</span>
+<span class="nc" id="L267">        fout.flush();</span>
+<span class="nc" id="L268">      } finally {</span>
+<span class="nc" id="L269">        fout.close();</span>
+      }
+<span class="nc" id="L271">    } catch (Exception ex) {</span>
+<span class="nc" id="L272">      Logger.getLogger(WindowsDpApiBackend.class.getName()).log(Level.SEVERE, null, ex);</span>
+<span class="nc" id="L273">      throw new PasswordSaveException(&quot;Failed to save password entries to a file&quot;);</span>
+    }
+<span class="nc" id="L275">  }</span>
+}
+</pre><div class="footer"><span class="right">Created with <a href="http://www.jacoco.org/jacoco">JaCoCo</a> 0.8.3.201901230119</span></div></body></html>
