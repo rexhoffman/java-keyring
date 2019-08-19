@@ -28,53 +28,40 @@
  * To change this template, choose Tools | Templates
  * and open the template in the editor.
  */
-package com.github.javakeyring.windows;
+package com.github.javakeyring.wincred;
 
 import static org.assertj.core.api.Assertions.assertThat;
 import static org.assertj.core.api.Assertions.assertThatThrownBy;
 import static org.assertj.core.api.Assertions.catchThrowable;
-import static org.junit.Assert.assertEquals;
 import static org.junit.Assert.assertTrue;
 import static org.junit.Assume.assumeTrue;
 
-import java.io.File;
-
 import org.junit.Test;
 
+import com.github.javakeyring.BackendNotSupportedException;
 import com.github.javakeyring.PasswordRetrievalException;
+import com.github.javakeyring.win.WinCredentialStoreBackend;
 import com.sun.jna.Platform;
 
 /**
  * Test of WindowsDPAPIBackend class.
  */
-public class WindowsDpApiBackendTest {
+public class WincredBackendTest {
 
-  private static final String SERVICE = "net.east301.keyring.windows unit test";
+  private static final String SERVICE = "net.east301.keyring.windows-unit-test";
 
   private static final String ACCOUNT = "tester";
 
   private static final String PASSWORD = "HogeHoge2012";
 
-  private static final String KEYSTORE_PREFIX = "keystore";
-
-  private static final String KEYSTORE_SUFFIX = ".keystore";
-
   /**
    * Test of isSupported method, of class WindowsDPAPIBackend.
+   * @throws BackendNotSupportedException if the backend may not be used in this environment.
    */
   @Test
-  public void testIsSupported() {
+  public void testIsSupported() throws BackendNotSupportedException {
     assumeTrue(Platform.isWindows());
-    assertTrue(new WindowsDpApiBackend().isSupported());
-  }
-
-  /**
-   * Test of isKeyStorePathRequired method, of class WindowsDPAPIBackend.
-   */
-  @Test
-  public void testIsKeyStorePathRequired() {
-    assumeTrue(Platform.isWindows());
-    assertTrue(new WindowsDpApiBackend().isKeyStorePathRequired());
+    assertTrue(new WinCredentialStoreBackend().isSupported());
   }
 
   /**
@@ -83,34 +70,12 @@ public class WindowsDpApiBackendTest {
   @Test
   public void testPasswordFlow() throws Exception {
     assumeTrue(Platform.isWindows());
-    File keystore = File.createTempFile(KEYSTORE_PREFIX, KEYSTORE_SUFFIX);
-    WindowsDpApiBackend backend = new WindowsDpApiBackend();
-    backend.setKeyStorePath(keystore.getPath());
+    WinCredentialStoreBackend backend = new WinCredentialStoreBackend();
     catchThrowable(() -> backend.deletePassword(SERVICE, ACCOUNT));
     backend.setPassword(SERVICE, ACCOUNT, PASSWORD);
     assertThat(backend.getPassword(SERVICE, ACCOUNT)).isEqualTo(PASSWORD);
     backend.deletePassword(SERVICE, ACCOUNT);
     assertThatThrownBy(() -> backend.getPassword(SERVICE, ACCOUNT)).isInstanceOf(PasswordRetrievalException.class);
   }  
-  
-  
-  /**
-   * Test of getID method, of class WindowsDPAPIBackend.
-   */
-  @Test
-  public void testGetId() {
-    assumeTrue(Platform.isWindows());
-    assertEquals("WindowsDPAPI", new WindowsDpApiBackend().getId());
-  }
 
-  /**
-   * Test of getLockPath method, of class WindowsDPAPIBackend.
-   */
-  @Test
-  public void testGetLockPath() throws Exception {
-    assumeTrue(Platform.isWindows());
-    WindowsDpApiBackend backend = new WindowsDpApiBackend();
-    backend.setKeyStorePath("/path/to/keystore");
-    assertEquals("/path/to/keystore.lock", backend.getLockPath());
-  }
 }

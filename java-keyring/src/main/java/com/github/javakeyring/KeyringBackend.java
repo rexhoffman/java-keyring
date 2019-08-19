@@ -26,8 +26,6 @@
  */
 package com.github.javakeyring;
 
-import com.github.javakeyring.util.LockException;
-
 /**
  * java-keyring backend interface.
  */
@@ -94,7 +92,7 @@ public abstract class KeyringBackend {
    * @throws LockException
    *           Thrown when an error happened while getting password
    */
-  public abstract String getPassword(String service, String account) throws LockException, PasswordRetrievalException;
+  public abstract String getPassword(String service, String account) throws PasswordRetrievalException;
 
   /**
    * Sets password to key store.
@@ -113,7 +111,7 @@ public abstract class KeyringBackend {
    *           Thrown when an error happened while getting password
    */
   public abstract void setPassword(String service, String account, String password)
-      throws LockException, PasswordSaveException;
+      throws PasswordSaveException;
 
-  public abstract void deletePassword(String service, String account) throws LockException, PasswordSaveException;
+  public abstract void deletePassword(String service, String account) throws PasswordSaveException;
 }

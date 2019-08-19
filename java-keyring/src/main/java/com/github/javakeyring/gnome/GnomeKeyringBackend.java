@@ -41,7 +41,6 @@ import com.github.javakeyring.KeyringBackend;
 import com.github.javakeyring.PasswordRetrievalException;
 import com.github.javakeyring.PasswordSaveException;
 import com.sun.jna.Platform;
-import com.sun.jna.Pointer;
 import com.sun.jna.ptr.IntByReference;
 import com.sun.jna.ptr.PointerByReference;
 
@@ -91,25 +90,17 @@ public class GnomeKeyringBackend extends KeyringBackend {
    */
   @Override
   public String getPassword(String service, String account) throws PasswordRetrievalException {
-
     PointerByReference ptr = new PointerByReference();
-    Pointer item = null;
     Map<String, Integer> map = loadMap();
     Integer id = map.get(service + "/" + account);
     if (id == null) {
       throw new PasswordRetrievalException("No password stored for this service and account.");
     }
-    try {
-      int result = libraries.getGklib().gnome_keyring_item_get_info_full_sync(null, id, 1, ptr);
-      if (result == 0) {
-        return libraries.getGklib().gnome_keyring_item_info_get_secret(ptr.getValue());
-      } else {
-        throw new PasswordRetrievalException(libraries.getGklib().gnome_keyring_result_to_message(result));
-      }
-    } finally {
-      if (item != null) {
-        libraries.getGklib().gnome_keyring_item_info_free(item);
-      }
+    int result = libraries.getGklib().gnome_keyring_item_get_info_full_sync(null, id, 1, ptr);
+    if (result == 0) {
+      return libraries.getGklib().gnome_keyring_item_info_get_secret(ptr.getValue());
+    } else {
+      throw new PasswordRetrievalException(libraries.getGklib().gnome_keyring_result_to_message(result));
     }
   }
 

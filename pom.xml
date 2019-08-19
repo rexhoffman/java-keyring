@@ -17,7 +17,6 @@
 
     <modules>
         <module>java-keyring</module>
-        <module>java-keyring-example</module>
     </modules>
 
     <properties>

@@ -24,40 +24,40 @@
  * (INCLUDING NEGLIGENCE OR OTHERWISE) ARISING IN ANY WAY OUT OF THE USE OF THIS
  * SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
  */
-package com.github.javakeyring;
+package com.github.javakeyring.win;
 
-import static org.junit.Assert.assertEquals;
-import static org.junit.Assert.assertNull;
-
-import org.junit.Test;
-
-import com.github.javakeyring.memory.UnencryptedMemoryBackend;
+import com.github.javakeyring.BackendNotSupportedException;
+import com.sun.jna.Native;
 
 /**
- * Test of KeyringBackend class.
+ * Global native library manager.
  */
-public class KeyringBackendTest {
+class NativeLibraryManager {
 
   /**
-   * Test of getKeyStorePath method, of class KeyringBackend.
+   * An instance of Advapi32.
    */
-  @Test
-  public void testGetKeyStorePath() {
-    KeyringBackend instance = new UnencryptedMemoryBackend();
-    assertNull(instance.getKeyStorePath());
-    instance.setKeyStorePath("/path/to/keystore");
-    assertEquals("/path/to/keystore", instance.getKeyStorePath());
-  }
+  private final Advapi32 advapi32;
 
   /**
-   * Test of setKeyStorePath method, of class KeyringBackend.
+   * An instance of Kernel32.
    */
-  @Test
-  public void testSetKeyStorePath() {
-    KeyringBackend instance = new UnencryptedMemoryBackend();
-    instance.setKeyStorePath("/path/to/keystore");
-    assertEquals("/path/to/keystore", instance.getKeyStorePath());
+  private final Kernel32 kernel32;
+  
+  public NativeLibraryManager() throws BackendNotSupportedException {
+    try {
+      advapi32 = (Advapi32) Native.load("Advapi32", Advapi32.class);
+      kernel32 = (Kernel32) Native.load("Kernel32", Kernel32.class);
+    } catch (UnsatisfiedLinkError ex) {
+      throw new BackendNotSupportedException("Failed to load native library");
+    }
+  }
+  
+  public Advapi32 getAdvapi32() {
+    return advapi32;
   }
 
- 
+  public Kernel32 getKernel32() {
+    return kernel32;
+  }
 }

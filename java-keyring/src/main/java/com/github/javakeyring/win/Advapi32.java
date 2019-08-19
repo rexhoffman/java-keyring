@@ -24,89 +24,62 @@
  * (INCLUDING NEGLIGENCE OR OTHERWISE) ARISING IN ANY WAY OUT OF THE USE OF THIS
  * SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
  */
-package com.github.javakeyring.windows;
+package com.github.javakeyring.win;
 
-import java.io.Serializable;
+import com.github.javakeyring.win.WinCredentialStoreBackend.CREDENTIAL;
+import com.sun.jna.Library;
+import com.sun.jna.platform.win32.WinDef.DWORD;
+import com.sun.jna.ptr.PointerByReference;
 
 /**
- * Password Entry.
+ * OS X CoreFoundation library.
  */
-class PasswordEntry implements Serializable {
-
-  private static final long serialVersionUID = 1L;
-
-  /**
-   * Service name.
-   */
-  private String service;
+@SuppressWarnings({"AbbreviationAsWordInName","ParameterName", "MethodName"})
+interface Advapi32 extends Library {
 
   /**
-   * Account name.
-   */
-  private String account;
-
-  /**
-   * Password.
-   */
-  private byte[] password;
-
+   * Advapi32.lib
+   * @param TargetName name of credential in store
+   * @param Type cred type 
+   * @param Flags always zero
+   * @param Credential credential pointer
+   * @return success or failure.
+   */  
+  public boolean CredReadA(
+      String             TargetName,
+      DWORD              Type,
+      DWORD              Flags,
+      PointerByReference Credential
+      );
   
   /**
-   * Initializes an instance of PasswordEntry.
-   *
-   * @param service
-   *          Service name
-   * @param account
-   *          Account name
-   * @param password
-   *          Password
-   */
-  public PasswordEntry(String service, String account, byte[] password) {
-    this.service = service;
-    this.account = account;
-    this.password = password;
-  }
-
+   * Advapi32.lib
+   * @param Credential credential pointer
+   * @param Flags always zero
+   * @return success or failure.
+   */  
+  public boolean CredWriteA(
+      CREDENTIAL         Credential,
+      DWORD              Flags
+      );
+  
   /**
-   * Returns service name.
+   * Advapi32.lib
+   * @param Credential who's memory we'll free.
+   * @param Flags has one value, set to use existing credential memory or not.
+   * @return success or failure.
    */
-  public String getService() {
-    return service;
-  }
-
+  public boolean CredFree(
+      PointerByReference Credential
+      );
+    
   /**
-   * Sets service name.
+   * Advapi32.lib
+   * @param TargetName name of credential in store
+   * @param Type cred type 
+   * @param Flags always zero
+   * @return success or failure.
    */
-  public void setService(String service) {
-    this.service = service;
-  }
-
-  /**
-   * Returns account name.
-   */
-  public String getAccount() {
-    return account;
-  }
-
-  /**
-   * Sets account name.
-   */
-  public void setAccount(String account) {
-    this.account = account;
-  }
-
-  /**
-   * Returns password.
-   */
-  public byte[] getPassword() {
-    return password;
-  }
-
-  /**
-   * Sets password.
-   */
-  public void setPassword(byte[] password) {
-    this.password = password;
-  }
-
+  public boolean CredDeleteA(String TargetName, DWORD type, DWORD flags);
+  
 }

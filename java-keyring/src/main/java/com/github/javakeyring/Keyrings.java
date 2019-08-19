@@ -27,15 +27,13 @@
 package com.github.javakeyring;
 
 import com.github.javakeyring.gnome.GnomeKeyringBackend;
-import com.github.javakeyring.memory.UnencryptedMemoryBackend;
 import com.github.javakeyring.osx.OsxKeychainBackend;
-import com.github.javakeyring.windows.WindowsDpApiBackend;
+import com.github.javakeyring.win.WinCredentialStoreBackend;
 
 public enum Keyrings {
   OSXKeychain(OsxKeychainBackend.class),
   GNOMEKeyring(GnomeKeyringBackend.class),
-  WindowsDPAPI(WindowsDpApiBackend.class),
-  UnencryptedMemory(UnencryptedMemoryBackend.class);
+  WindowsCrendialStore(WinCredentialStoreBackend.class);
   
   private final Class<? extends KeyringBackend> supportingClass;
       

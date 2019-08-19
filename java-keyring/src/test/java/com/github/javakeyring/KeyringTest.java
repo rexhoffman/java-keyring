@@ -48,7 +48,7 @@ import com.sun.jna.Platform;
 @RunWith(Junit4AopClassRunner.class)
 public class KeyringTest {
 
-  private static final String SERVICE = "net.east301.keyring unit test";
+  private static final String SERVICE = "net.east301.keyring-unit-test";
 
   private static final String ACCOUNT = "tester";
 
@@ -77,11 +77,10 @@ public class KeyringTest {
     if (Platform.isMac()) {
       assertThat(Keyring.create(Keyrings.OSXKeychain)).isNotNull();
     } else if (Platform.isWindows()) {
-      assertThat(Keyring.create(Keyrings.WindowsDPAPI)).isNotNull();
+      assertThat(Keyring.create(Keyrings.WindowsCrendialStore)).isNotNull();
     } else if (Platform.isLinux()) {
       assertThat(Keyring.create(Keyrings.GNOMEKeyring)).isNotNull();
     }
-    assertThat(Keyring.create(Keyrings.UnencryptedMemory)).isNotNull();
   }
 
   /**

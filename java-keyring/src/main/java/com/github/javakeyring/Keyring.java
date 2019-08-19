@@ -26,8 +26,6 @@
  */
 package com.github.javakeyring;
 
-import com.github.javakeyring.util.LockException;
-
 /**
  * Keyring.
  */
@@ -111,7 +109,7 @@ public class Keyring {
    * @throws LockException
    *           can't establish lock.
    */
-  public String getPassword(String service, String account) throws LockException, PasswordRetrievalException {
+  public String getPassword(String service, String account) throws PasswordRetrievalException {
     return backend.getPassword(service, account);
   }
 
@@ -130,7 +128,7 @@ public class Keyring {
    * @throws LockException
    *           can't establish lock.
    */
-  public void setPassword(String service, String account, String password) throws LockException, PasswordSaveException {
+  public void setPassword(String service, String account, String password) throws PasswordSaveException {
     backend.setPassword(service, account, password);
   }
   
@@ -147,7 +145,7 @@ public class Keyring {
    * @throws LockException
    *           can't establish lock.
    */
-  public void deletePassword(String service, String account) throws LockException, PasswordSaveException {
+  public void deletePassword(String service, String account) throws PasswordSaveException {
     backend.deletePassword(service, account);
   }
 }

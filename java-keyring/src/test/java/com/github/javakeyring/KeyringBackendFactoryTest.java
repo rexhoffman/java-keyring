@@ -36,9 +36,8 @@ import org.junit.runner.RunWith;
 import com.github.advisedtesting.classloader.RestrictiveClassloader;
 import com.github.advisedtesting.junit4.Junit4AopClassRunner;
 import com.github.javakeyring.gnome.GnomeKeyringBackend;
-import com.github.javakeyring.memory.UnencryptedMemoryBackend;
 import com.github.javakeyring.osx.OsxKeychainBackend;
-import com.github.javakeyring.windows.WindowsDpApiBackend;
+import com.github.javakeyring.win.WinCredentialStoreBackend;
 import com.sun.jna.Platform;
 
 /**
@@ -58,24 +57,11 @@ public class KeyringBackendFactoryTest {
     if (Platform.isMac()) {
       assertTrue(backend instanceof OsxKeychainBackend);
     } else if (Platform.isWindows()) {
-      assertTrue(backend instanceof WindowsDpApiBackend);
+      assertTrue(backend instanceof WinCredentialStoreBackend);
     } else if (Platform.isLinux()) {
       assertTrue(backend instanceof GnomeKeyringBackend);
     } else {
       fail("Unsupported platform");
     }
   }
-
-  /**
-   * Test of create method, of class KeyringBackendFactory by specifying
-   * UncryptedMemory.
-   */
-  @Test
-  @RestrictiveClassloader
-  public void testCreateStringUnencryptedMemory() throws Exception {
-    KeyringBackend backend = KeyringBackendFactory.create(Keyrings.UnencryptedMemory);
-    assertNotNull(backend);
-    assertTrue(backend instanceof UnencryptedMemoryBackend);
-  }
-
 }
