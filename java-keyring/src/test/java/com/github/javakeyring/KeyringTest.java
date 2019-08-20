@@ -94,8 +94,8 @@ public class KeyringTest {
       assertEquals("/path/to/keystore", keyring.getKeyStorePath());
       assertThat(keyring.isKeyStorePathSupported()).isTrue();
       assertThat(keyring.getKeyrings())
-          .as("Keyring type should be osx or windows")
-          .isIn(Keyrings.OSX_KEYCHAIN, Keyrings.WINDOWS_CREDENTIAL_STORE);
+          .as("Keyring type should be gnome keyring")
+          .isEqualTo(Keyrings.GNOME_KEYRING);
     } else {
       assertThat(keyring.getKeyrings())
           .as("Gnome Keyring should have tested the keystore path")
