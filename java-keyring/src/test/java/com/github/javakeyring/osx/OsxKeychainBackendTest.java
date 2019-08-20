@@ -33,6 +33,7 @@ import static org.junit.Assume.assumeTrue;
 
 import org.junit.Test;
 
+import com.github.javakeyring.KeyStorePath;
 import com.github.javakeyring.PasswordRetrievalException;
 import com.sun.jna.Platform;
 
@@ -71,7 +72,7 @@ public class OsxKeychainBackendTest {
   @Test
   public void testIsKeyStorePathRequired() throws Exception {
     assumeTrue(Platform.isMac());
-    assertThat(new OsxKeychainBackend().isKeyStorePathRequired()).isFalse();
+    assertThat(new OsxKeychainBackend()).isNotInstanceOf(KeyStorePath.class);
   }
 
   /**
@@ -87,15 +88,6 @@ public class OsxKeychainBackendTest {
     assertThat(backend.getPassword(SERVICE, ACCOUNT)).isEqualTo(PASSWORD);
     backend.deletePassword(SERVICE, ACCOUNT);
     assertThatThrownBy(() -> backend.getPassword(SERVICE, ACCOUNT)).isInstanceOf(PasswordRetrievalException.class);
-  }
-
-  /**
-   * Test of getID method, of class OSXKeychainBackend.
-   */
-  @Test
-  public void testGetId() throws Exception {
-    assumeTrue(Platform.isMac());
-    assertThat(new OsxKeychainBackend().getId()).isEqualTo("OSXKeychain");
   }
 
   private static void checkExistanceOfPasswordEntry(OsxKeychainBackend backend) {

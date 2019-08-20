@@ -34,7 +34,7 @@ public class Keyring {
   /**
    * Keyring backend.
    */
-  private KeyringBackend backend;
+  private final KeyringBackend backend;
   
   /**
    * Creates an instance of Keyring using the a default backed based on operating system.
@@ -70,28 +70,42 @@ public class Keyring {
    * Gets path to key store (Proxy method of KeyringBackend.getKeyStorePath).
    * 
    * @return path to the keystore.
+   * @throws UnsupportedOperationException if {@link #isKeyStorePathSupported()} is false;
    */
   public String getKeyStorePath() {
-    return backend.getKeyStorePath();
+    if (isKeyStorePathSupported()) {
+      return ((KeyStorePath) backend).getKeyStorePath();
+    } else {
+      throw new UnsupportedOperationException(KeyStorePath.class.getSimpleName() + " is not supported on " + getKeyrings());
+    }
   }
 
   /**
    * Sets path to key store (Proxy method of KeyringBackend.setKeyStorePath).
    *
    * @param path Path to key store
+   * @throws UnsupportedOperationException if {@link #isKeyStorePathSupported()} is false;
    */
   public void setKeyStorePath(String path) {
-    backend.setKeyStorePath(path);
+	if (isKeyStorePathSupported()) {
+      ((KeyStorePath) backend).setKeyStorePath(path);
+	} else {
+	  throw new UnsupportedOperationException(KeyStorePath.class.getSimpleName() + " is not supported on " + getKeyrings());
+	}
   }
 
+  public Keyrings getKeyrings() {
+	  return Keyrings.getLabelForBackend(backend.getClass());
+  }
+  
   /**
    * Returns true if the backend directory uses some file to store passwords.
    * (Proxy method of KeyringBackend.isKeyStorePathRequired)
    * 
    * @return if a path is required to store a password.
    */
-  public boolean isKeyStorePathRequired() {
-    return backend.isKeyStorePathRequired();
+  public boolean isKeyStorePathSupported() {
+    return backend instanceof KeyStorePath;
   }
 
   /**

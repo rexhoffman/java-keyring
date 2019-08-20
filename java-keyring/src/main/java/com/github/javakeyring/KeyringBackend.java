@@ -28,53 +28,17 @@ package com.github.javakeyring;
 
 /**
  * java-keyring backend interface.
+ * 
+ * May also implement {@link KeyStorePath} if there is support for backing files on they file system.
  */
-public abstract class KeyringBackend {
+public interface KeyringBackend {
 
   /**
-   * Path to key store.
-   */
-  protected String keyStorePath;
-  
-  /**
-   * Gets backend Id.
-   * 
-   * @return the identifier for the backend.
-   */
-  public abstract String getId();
-
-  /**
-   * Gets path to key store.
-   * 
-   * @return a keystore path (if required by backend)
-   */
-  public String getKeyStorePath() {
-    return keyStorePath;
-  }
-
-  /**
-   * Sets path to key store.
+   * Returns true when the back end is supported.
    *
-   * @param path
-   *          Path to key store
+   * @return true if the back end will function on the machine.
    */
-  public void setKeyStorePath(String path) {
-    keyStorePath = path;
-  }
-
-  /**
-   * Returns true when the backend is supported.
-   *
-   * @return true if the backend will function on the machine.
-   */
-  public abstract boolean isSupported();
-
-  /**
-   * Returns true if the backend directory uses some file to store passwords.
-   * 
-   * @return true if a key store path is required.
-   */
-  public abstract boolean isKeyStorePathRequired();
+  public boolean isSupported();
 
   /**
    * Gets password from key store.
@@ -92,7 +56,7 @@ public abstract class KeyringBackend {
    * @throws LockException
    *           Thrown when an error happened while getting password
    */
-  public abstract String getPassword(String service, String account) throws PasswordRetrievalException;
+  public String getPassword(String service, String account) throws PasswordRetrievalException;
 
   /**
    * Sets password to key store.
@@ -110,8 +74,22 @@ public abstract class KeyringBackend {
    * @throws LockException
    *           Thrown when an error happened while getting password
    */
-  public abstract void setPassword(String service, String account, String password)
+  public void setPassword(String service, String account, String password)
       throws PasswordSaveException;
 
-  public abstract void deletePassword(String service, String account) throws PasswordSaveException;
+  /**
+   * Deletes password from keystore.
+   *
+   * @param service
+   *          Service name
+   * @param account
+   *          Account name
+   *
+   * @throws PasswordSaveException
+   *           Thrown when an error happened while saving the password
+   *           
+   * @throws LockException
+   *           Thrown when an error happened while getting password
+   */
+  public void deletePassword(String service, String account) throws PasswordSaveException;
 }

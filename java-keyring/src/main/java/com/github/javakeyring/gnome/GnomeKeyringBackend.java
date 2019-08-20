@@ -37,6 +37,7 @@ import java.util.logging.Level;
 import java.util.logging.Logger;
 
 import com.github.javakeyring.BackendNotSupportedException;
+import com.github.javakeyring.KeyStorePath;
 import com.github.javakeyring.KeyringBackend;
 import com.github.javakeyring.PasswordRetrievalException;
 import com.github.javakeyring.PasswordSaveException;
@@ -46,9 +47,13 @@ import com.sun.jna.ptr.PointerByReference;
 
 /**
  * Keyring backend which uses GNOME Keyring.
+ * 
+ * Maybe replace with https://specifications.freedesktop.org/secret-service/?
  */
-public class GnomeKeyringBackend extends KeyringBackend {
+public class GnomeKeyringBackend implements KeyringBackend, KeyStorePath {
 
+  private String keyStorePath = "keystore.keystore";
+	
   private final NativeLibraryManager libraries;
   
   public GnomeKeyringBackend() throws BackendNotSupportedException {
@@ -65,14 +70,6 @@ public class GnomeKeyringBackend extends KeyringBackend {
   @Override
   public boolean isSupported() {
     return Platform.isLinux();
-  }
-
-  /**
-   * Returns true if the backend directory uses some file to store passwords.
-   */
-  @Override
-  public boolean isKeyStorePathRequired() {
-    return true;
   }
 
   /**
@@ -147,15 +144,6 @@ public class GnomeKeyringBackend extends KeyringBackend {
     map.remove(service + "/" + account);
     saveMap(map);
   }
-  
-
-  /**
-   * Gets backend ID.
-   */
-  @Override
-  public String getId() {
-    return "GNOMEKeyring";
-  }
 
   /**
    * Loads map from a file. This method is not thread/process safe.
@@ -203,4 +191,15 @@ public class GnomeKeyringBackend extends KeyringBackend {
       throw new PasswordSaveException("Failed to save password entries to a file");
     }
   }
-} // class GNOMEKeyringBackend
+  
+  @Override
+  public String getKeyStorePath() {
+    return keyStorePath;
+  }
+
+  @Override
+  public void setKeyStorePath(String path) {
+    keyStorePath = path;
+  }
+
+}

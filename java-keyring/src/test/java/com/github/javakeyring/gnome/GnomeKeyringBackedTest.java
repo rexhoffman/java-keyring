@@ -35,6 +35,7 @@ import java.io.File;
 
 import org.junit.Test;
 
+import com.github.javakeyring.KeyStorePath;
 import com.github.javakeyring.PasswordRetrievalException;
 import com.sun.jna.Platform;
 
@@ -77,7 +78,7 @@ public class GnomeKeyringBackedTest {
   @Test
   public void testIsKeyStorePathRequired() throws Exception {
     assumeTrue(Platform.isLinux());
-    assertThat(new GnomeKeyringBackend().isKeyStorePathRequired()).isTrue();
+    assertThat(new GnomeKeyringBackend()).isInstanceOf(KeyStorePath.class);
   }
 
   /**
@@ -94,15 +95,6 @@ public class GnomeKeyringBackedTest {
     assertThat(backend.getPassword(SERVICE, ACCOUNT)).isEqualTo(PASSWORD);
     backend.deletePassword(SERVICE, ACCOUNT);
     assertThatThrownBy(() -> backend.getPassword(SERVICE, ACCOUNT)).isInstanceOf(PasswordRetrievalException.class);
-  }
-
-  /**
-   * Test of getID method, of class GnomeKeyringBackend.
-   */
-  @Test
-  public void testGetId() throws Exception {
-    assumeTrue(Platform.isLinux());
-    assertThat(new GnomeKeyringBackend().getId()).isEqualTo("GNOMEKeyring");
   }
 
   private static void checkExistanceOfPasswordEntry(GnomeKeyringBackend backend) {

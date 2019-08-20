@@ -38,7 +38,7 @@ import com.sun.jna.Pointer;
 /**
  * Keyring backend which uses OS X Keychain.
  */
-public class OsxKeychainBackend extends KeyringBackend {
+public class OsxKeychainBackend implements KeyringBackend {
 
   private final NativeLibraryManager nativeLibraries;
   
@@ -52,14 +52,6 @@ public class OsxKeychainBackend extends KeyringBackend {
   @Override
   public boolean isSupported() {
     return Platform.isMac();
-  }
-
-  /**
-   * Returns true if the backend directory uses some file to store passwords.
-   */
-  @Override
-  public boolean isKeyStorePathRequired() {
-    return false;
   }
 
   /**
@@ -166,16 +158,6 @@ public class OsxKeychainBackend extends KeyringBackend {
     if (status != 0) {
       throw new PasswordSaveException(convertErrorCodeToMessage(status));
     }
-  }  
-  
-  
-  
-  /**
-   * Gets backend ID.
-   */
-  @Override
-  public String getId() {
-    return "OSXKeychain";
   }
 
   /**

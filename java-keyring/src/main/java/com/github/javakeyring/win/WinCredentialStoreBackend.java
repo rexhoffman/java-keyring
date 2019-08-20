@@ -27,8 +27,6 @@
 package com.github.javakeyring.win;
 
 import java.nio.charset.Charset;
-import java.util.Arrays;
-import java.util.List;
 
 import com.github.javakeyring.BackendNotSupportedException;
 import com.github.javakeyring.KeyringBackend;
@@ -36,10 +34,6 @@ import com.github.javakeyring.PasswordRetrievalException;
 import com.github.javakeyring.PasswordSaveException;
 import com.sun.jna.Memory;
 import com.sun.jna.Platform;
-import com.sun.jna.Pointer;
-import com.sun.jna.Structure;
-import com.sun.jna.WString;
-import com.sun.jna.platform.win32.WinBase.FILETIME;
 import com.sun.jna.platform.win32.WinDef.DWORD;
 import com.sun.jna.ptr.PointerByReference;
 
@@ -47,47 +41,12 @@ import com.sun.jna.ptr.PointerByReference;
  * A Windows "Credential Store" backend.
  *
  */
-public class WinCredentialStoreBackend extends KeyringBackend {
+public class WinCredentialStoreBackend implements KeyringBackend {
 
   /*
    * Big thanks to this stack overflow for this one.
    * https://stackoverflow.com/questions/38404517/how-to-map-windows-api-credwrite-credread-in-jna
    */
-  
-  /**
-   * represents a credential.
-   */
-  @SuppressWarnings({"AbbreviationAsWordInName","ParameterName","MemberName"})
-  public static class CREDENTIAL extends Structure {
-    public int Flags;
-    public int Type;
-    public String TargetName;
-    public String Comment;
-    public FILETIME LastWritten;
-    public int CredentialBlobSize;
-    public Pointer CredentialBlob;
-    public int Persist;
-    public int AttributeCount;
-    public Pointer Attributes;
-    public WString TargetAlias;
-    public String UserName;
-
-    public CREDENTIAL() { }
-
-    public CREDENTIAL(Pointer ptr) {
-      // initialize ourself from the raw memory block returned to us by ADVAPI32
-      super(ptr);
-      read();
-    }
-
-    @Override
-    protected List<String> getFieldOrder() {
-      return Arrays.asList("Flags", "Type", "TargetName", "Comment", "LastWritten", "CredentialBlobSize",
-          "CredentialBlob", "Persist", "AttributeCount", "Attributes", "TargetAlias", "UserName");
-    }
-  }
-  
-
 
   NativeLibraryManager nativeLibraries = new NativeLibraryManager();
 
@@ -101,17 +60,6 @@ public class WinCredentialStoreBackend extends KeyringBackend {
   @Override
   public boolean isSupported() {
     return Platform.isWindows();
-  }
-
-  @Override
-  public String getId() {
-    // TODO Auto-generated method stub
-    return null;
-  }
-
-  @Override
-  public boolean isKeyStorePathRequired() {
-    return false;
   }
 
   @Override

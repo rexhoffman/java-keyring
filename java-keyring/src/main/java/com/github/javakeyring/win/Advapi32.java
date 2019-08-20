@@ -26,7 +26,7 @@
  */
 package com.github.javakeyring.win;
 
-import com.github.javakeyring.win.WinCredentialStoreBackend.CREDENTIAL;
+import com.github.javakeyring.win.CREDENTIAL;
 import com.sun.jna.Library;
 import com.sun.jna.platform.win32.WinDef.DWORD;
 import com.sun.jna.ptr.PointerByReference;

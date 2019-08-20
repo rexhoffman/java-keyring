@@ -26,6 +26,8 @@
  */
 package com.github.javakeyring;
 
+import java.util.Arrays;
+
 import com.github.javakeyring.gnome.GnomeKeyringBackend;
 import com.github.javakeyring.osx.OsxKeychainBackend;
 import com.github.javakeyring.win.WinCredentialStoreBackend;
@@ -43,5 +45,13 @@ public enum Keyrings {
   
   public Class<? extends KeyringBackend> getSupportingClass() {
     return supportingClass;
+  }
+  
+  public static Keyrings getLabelForBackend(Class<? extends KeyringBackend> backendClass) {
+	return Arrays.asList(Keyrings.values())
+	    .stream()
+	    .filter(keyring -> keyring.supportingClass == backendClass)
+	    .findFirst()
+	    .orElseThrow(() -> new IllegalArgumentException(backendClass + " is not backed by an enum value in Keyrings"));
   }
 }

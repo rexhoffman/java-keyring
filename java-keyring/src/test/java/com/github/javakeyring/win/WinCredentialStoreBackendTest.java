@@ -28,7 +28,7 @@
  * To change this template, choose Tools | Templates
  * and open the template in the editor.
  */
-package com.github.javakeyring.wincred;
+package com.github.javakeyring.win;
 
 import static org.assertj.core.api.Assertions.assertThat;
 import static org.assertj.core.api.Assertions.assertThatThrownBy;
@@ -46,7 +46,7 @@ import com.sun.jna.Platform;
 /**
  * Test of WindowsDPAPIBackend class.
  */
-public class WincredBackendTest {
+public class WinCredentialStoreBackendTest {
 
   private static final String SERVICE = "net.east301.keyring.windows-unit-test";
 

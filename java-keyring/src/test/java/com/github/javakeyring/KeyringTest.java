@@ -31,7 +31,6 @@ import static org.assertj.core.api.Assertions.assertThatThrownBy;
 import static org.assertj.core.api.Assertions.catchThrowable;
 import static org.junit.Assert.assertEquals;
 import static org.junit.Assert.assertNotNull;
-import static org.junit.Assert.assertNull;
 
 import java.io.File;
 
@@ -84,26 +83,25 @@ public class KeyringTest {
   }
 
   /**
-   * Test of getKeyStorePath method, of class Keyring.
-   */
-  @Test
-  @RestrictiveClassloader
-  public void testGetKeyStorePath() throws Exception {
-    Keyring keyring = Keyring.create();
-    assertNull(keyring.getKeyStorePath());
-    keyring.setKeyStorePath("/path/to/keystore");
-    assertEquals("/path/to/keystore", keyring.getKeyStorePath());
-  }
-
-  /**
-   * Test of setKeyStorePath method, of class Keyring.
+   * Test of get/setKeyStorePath method, of class Keyring.
    */
   @Test
   @RestrictiveClassloader
   public void testSetKeyStorePath() throws Exception {
     Keyring keyring = Keyring.create();
-    keyring.setKeyStorePath("/path/to/keystore");
-    assertEquals("/path/to/keystore", keyring.getKeyStorePath());
+    if (keyring.isKeyStorePathSupported()) {
+      keyring.setKeyStorePath("/path/to/keystore");
+      assertEquals("/path/to/keystore", keyring.getKeyStorePath());
+      assertThat(keyring.isKeyStorePathSupported()).isTrue();
+      assertThat(keyring.getKeyrings())
+          .as("Keyring type should be osx or windows")
+          .isIn(Keyrings.OSXKeychain, Keyrings.WindowsCrendialStore);
+    } else {
+      assertThat(keyring.getKeyrings())
+          .as("Gnome Keyring should have tested the keystore path")
+          .isNotEqualTo(Keyrings.GNOMEKeyring);
+      assertThat(keyring.isKeyStorePathSupported()).isFalse();
+    }
   }
 
 
@@ -114,7 +112,7 @@ public class KeyringTest {
   @RestrictiveClassloader
   public void testPasswordFlow() throws Exception {
     Keyring keyring = Keyring.create();
-    if (keyring.isKeyStorePathRequired()) {
+    if (keyring.isKeyStorePathSupported()) {
       keyring.setKeyStorePath(File.createTempFile(KEYSTORE_PREFIX, KEYSTORE_SUFFIX).getPath());
     }
     catchThrowable(() -> keyring.deletePassword(SERVICE, ACCOUNT));
