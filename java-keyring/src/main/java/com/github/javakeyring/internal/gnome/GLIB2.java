@@ -24,23 +24,16 @@
  * (INCLUDING NEGLIGENCE OR OTHERWISE) ARISING IN ANY WAY OUT OF THE USE OF THIS
  * SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
  */
-package com.github.javakeyring;
+package com.github.javakeyring.internal.gnome;
+
+import com.sun.jna.Library;
 
 /**
- * Represents an error while retrieving password.
+ * GLib2 library.
  */
-public class PasswordSaveException extends Exception {
+@SuppressWarnings({"AbbreviationAsWordInName","MethodName"})
+interface GLIB2 extends Library {
 
-  private static final long serialVersionUID = 1L;
-  
-  /**
-   * Initializes an instance of PasswordSaveException.
-   *
-   * @param message
-   *          Error message
-   */
-  public PasswordSaveException(String message) {
-    super(message);
-  }
+  void g_set_application_name(String string);
 
-} // class PasswordSaveException
+}

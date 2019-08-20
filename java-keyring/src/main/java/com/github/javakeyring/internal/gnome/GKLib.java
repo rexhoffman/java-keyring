@@ -24,42 +24,30 @@
  * (INCLUDING NEGLIGENCE OR OTHERWISE) ARISING IN ANY WAY OUT OF THE USE OF THIS
  * SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
  */
-package com.github.javakeyring.osx;
+package com.github.javakeyring.internal.gnome;
 
-import com.github.javakeyring.BackendNotSupportedException;
-import com.sun.jna.Native;
+import com.sun.jna.Library;
+import com.sun.jna.Pointer;
+import com.sun.jna.ptr.IntByReference;
+import com.sun.jna.ptr.PointerByReference;
 
 /**
- * Global native library manager.
+ * GKLib.
  */
-class NativeLibraryManager {
+@SuppressWarnings({"AbbreviationAsWordInName","ParameterName"})
+interface GKLib extends Library {
 
-  /**
-   * An instance of CoreFoundationLibrary.
-   */
-  private final CoreFoundationLibrary coreFoundation;
-
-  /**
-   * An instance of SecurityLibrary.
-   */
-  private final SecurityLibrary security;
+  int gnome_keyring_unlock_sync(String keyring, String password);
   
-  public NativeLibraryManager() throws BackendNotSupportedException {
-    try {
-      coreFoundation = (CoreFoundationLibrary) Native.load("CoreFoundation", CoreFoundationLibrary.class);
-      security = (SecurityLibrary) Native.load("Security", SecurityLibrary.class);
-    } catch (UnsatisfiedLinkError ex) {
-      throw new BackendNotSupportedException("Failed to load native library");
-    }
-  }
+  int gnome_keyring_item_get_info_full_sync(String keyring, int id, int flags, PointerByReference item_info);
 
-  public CoreFoundationLibrary getCoreFoundation() {
-    return coreFoundation;
-  }
+  void gnome_keyring_item_info_free(Pointer item_info);
 
-  public SecurityLibrary getSecurity() {
-    return security;
-  }
-  
-  
+  String gnome_keyring_item_info_get_secret(Pointer item_info);
+
+  String gnome_keyring_result_to_message(int r);
+
+  int gnome_keyring_set_network_password_sync(String keyring, String user, String domain, String server, String object,
+      String protocol, String authtype, int port, String password, IntByReference item_id);
+
 }

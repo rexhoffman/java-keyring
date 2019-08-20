@@ -24,62 +24,40 @@
  * (INCLUDING NEGLIGENCE OR OTHERWISE) ARISING IN ANY WAY OUT OF THE USE OF THIS
  * SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
  */
-package com.github.javakeyring.win;
+package com.github.javakeyring.internal.windows;
 
-import com.github.javakeyring.win.CREDENTIAL;
-import com.sun.jna.Library;
-import com.sun.jna.platform.win32.WinDef.DWORD;
-import com.sun.jna.ptr.PointerByReference;
+import com.github.javakeyring.BackendNotSupportedException;
+import com.sun.jna.Native;
 
 /**
- * OS X CoreFoundation library.
+ * Global native library manager.
  */
-@SuppressWarnings({"AbbreviationAsWordInName","ParameterName", "MethodName"})
-interface Advapi32 extends Library {
+class NativeLibraryManager {
 
   /**
-   * Advapi32.lib
-   * @param TargetName name of credential in store
-   * @param Type cred type 
-   * @param Flags always zero
-   * @param Credential credential pointer
-   * @return success or failure.
-   */  
-  public boolean CredReadA(
-      String             TargetName,
-      DWORD              Type,
-      DWORD              Flags,
-      PointerByReference Credential
-      );
-  
-  /**
-   * Advapi32.lib
-   * @param Credential credential pointer
-   * @param Flags always zero
-   * @return success or failure.
-   */  
-  public boolean CredWriteA(
-      CREDENTIAL         Credential,
-      DWORD              Flags
-      );
-  
-  /**
-   * Advapi32.lib
-   * @param Credential who's memory we'll free.
-   * @param Flags has one value, set to use existing credential memory or not.
-   * @return success or failure.
+   * An instance of Advapi32.
    */
-  public boolean CredFree(
-      PointerByReference Credential
-      );
-    
+  private final Advapi32 advapi32;
+
   /**
-   * Advapi32.lib
-   * @param TargetName name of credential in store
-   * @param Type cred type 
-   * @param Flags always zero
-   * @return success or failure.
+   * An instance of Kernel32.
    */
-  public boolean CredDeleteA(String TargetName, DWORD type, DWORD flags);
+  private final Kernel32 kernel32;
   
+  public NativeLibraryManager() throws BackendNotSupportedException {
+    try {
+      advapi32 = (Advapi32) Native.load("Advapi32", Advapi32.class);
+      kernel32 = (Kernel32) Native.load("Kernel32", Kernel32.class);
+    } catch (UnsatisfiedLinkError ex) {
+      throw new BackendNotSupportedException("Failed to load native library", ex);
+    }
+  }
+  
+  public Advapi32 getAdvapi32() {
+    return advapi32;
+  }
+
+  public Kernel32 getKernel32() {
+    return kernel32;
+  }
 }

@@ -24,16 +24,42 @@
  * (INCLUDING NEGLIGENCE OR OTHERWISE) ARISING IN ANY WAY OUT OF THE USE OF THIS
  * SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
  */
-package com.github.javakeyring.gnome;
+package com.github.javakeyring.internal.gnome;
 
-import com.sun.jna.Library;
+import com.github.javakeyring.BackendNotSupportedException;
+import com.sun.jna.Native;
 
 /**
- * GLib2 library.
+ * Global native library manager.
  */
-@SuppressWarnings({"AbbreviationAsWordInName","MethodName"})
-interface GLIB2 extends Library {
+class NativeLibraryManager {
 
-  void g_set_application_name(String string);
+  /**
+   * An instance of CoreFoundationLibrary.
+   */
+  private final GLIB2 glib2;
 
+  /**
+   * An instance of SecurityLibrary.
+   */
+  private final GKLib gklib;
+  
+  public NativeLibraryManager() throws BackendNotSupportedException {
+    try {
+      glib2 = (GLIB2) Native.load("glib-2.0", GLIB2.class);
+      gklib = (GKLib) Native.load("gnome-keyring", GKLib.class);
+    } catch (UnsatisfiedLinkError ex) {
+      throw new BackendNotSupportedException("Failed to load native library");
+    }
+  }
+
+  public GLIB2 getGlib2() {
+    return glib2;
+  }
+
+  public GKLib getGklib() {
+    return gklib;
+  }
+  
+  
 }

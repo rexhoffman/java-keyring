@@ -24,15 +24,22 @@
  * (INCLUDING NEGLIGENCE OR OTHERWISE) ARISING IN ANY WAY OUT OF THE USE OF THIS
  * SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
  */
-package com.github.javakeyring;
+package com.github.javakeyring.internal;
+
+import com.github.javakeyring.BackendNotSupportedException;
+import com.github.javakeyring.Keyrings;
 
 /**
  * Factory of KeyringBackend.
  */
-class KeyringBackendFactory {
+public class KeyringBackendFactory {
 
   /**
    * Creates an instance of KeyringBackend.
+   * @return the KeyringBackend.
+   * @throws BackendNotSupportedException 
+   *     should the preferred {@link Keyrings} not start of this system.
+   *     
    */
   public static KeyringBackend create() throws BackendNotSupportedException {
     for (Keyrings keyRing : Keyrings.values()) {
@@ -49,6 +56,9 @@ class KeyringBackendFactory {
    *
    * @param preferred
    *          Preferred backend name
+   * @return Creates an instance of KeyringBackend.
+   * @throws BackendNotSupportedException 
+   *          should the preferred {@link Keyrings} not start of this system.
    */
   public static KeyringBackend create(Keyrings preferred) throws BackendNotSupportedException {
     KeyringBackend backend = tryToCreateBackend(preferred);

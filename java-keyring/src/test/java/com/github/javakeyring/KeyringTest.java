@@ -74,11 +74,11 @@ public class KeyringTest {
   @RestrictiveClassloader
   public void testCreateString() throws Exception {
     if (Platform.isMac()) {
-      assertThat(Keyring.create(Keyrings.OSXKeychain)).isNotNull();
+      assertThat(Keyring.create(Keyrings.OSX_KEYCHAIN)).isNotNull();
     } else if (Platform.isWindows()) {
-      assertThat(Keyring.create(Keyrings.WindowsCrendialStore)).isNotNull();
+      assertThat(Keyring.create(Keyrings.WINDOWS_CREDENTIAL_STORE)).isNotNull();
     } else if (Platform.isLinux()) {
-      assertThat(Keyring.create(Keyrings.GNOMEKeyring)).isNotNull();
+      assertThat(Keyring.create(Keyrings.GNOME_KEYRING)).isNotNull();
     }
   }
 
@@ -95,11 +95,11 @@ public class KeyringTest {
       assertThat(keyring.isKeyStorePathSupported()).isTrue();
       assertThat(keyring.getKeyrings())
           .as("Keyring type should be osx or windows")
-          .isIn(Keyrings.OSXKeychain, Keyrings.WindowsCrendialStore);
+          .isIn(Keyrings.OSX_KEYCHAIN, Keyrings.WINDOWS_CREDENTIAL_STORE);
     } else {
       assertThat(keyring.getKeyrings())
           .as("Gnome Keyring should have tested the keystore path")
-          .isNotEqualTo(Keyrings.GNOMEKeyring);
+          .isNotEqualTo(Keyrings.GNOME_KEYRING);
       assertThat(keyring.isKeyStorePathSupported()).isFalse();
     }
   }
@@ -120,7 +120,7 @@ public class KeyringTest {
     keyring.setPassword(SERVICE, ACCOUNT, PASSWORD);
     assertThat(keyring.getPassword(SERVICE, ACCOUNT)).isEqualTo(PASSWORD);
     keyring.deletePassword(SERVICE, ACCOUNT);
-    assertThatThrownBy(() -> keyring.getPassword(SERVICE, ACCOUNT)).isInstanceOf(PasswordRetrievalException.class);
+    assertThatThrownBy(() -> keyring.getPassword(SERVICE, ACCOUNT)).isInstanceOf(PasswordAccessException.class);
   }
 
   private static void checkExistanceOfPasswordEntry(Keyring keyring) {

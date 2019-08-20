@@ -24,10 +24,9 @@
  * (INCLUDING NEGLIGENCE OR OTHERWISE) ARISING IN ANY WAY OUT OF THE USE OF THIS
  * SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
  */
-package com.github.javakeyring.win;
+package com.github.javakeyring.internal.windows;
 
 import com.sun.jna.Library;
-import com.sun.jna.platform.win32.WinDef.DWORD;
 
 @SuppressWarnings({"AbbreviationAsWordInName","ParameterName", "MethodName"})
 public interface Kernel32 extends Library {
@@ -36,6 +35,6 @@ public interface Kernel32 extends Library {
    * Returns integer representing last error.
    * @return integer representing last error.
    */
-  DWORD GetLastError();
+  Integer GetLastError();
 
 }

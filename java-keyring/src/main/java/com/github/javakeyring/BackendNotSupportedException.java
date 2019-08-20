@@ -39,5 +39,17 @@ public class BackendNotSupportedException extends Exception {
   public BackendNotSupportedException(String message) {
     super(message);
   }
+  
+  /**
+   * Initializes an instance of BackendNotSupportedException.
+   *
+   * @param message
+   *          Error message
+   * @param causedBy
+   *          If another exception caused this exception, set here.
+   */
+  public BackendNotSupportedException(String message, Throwable causedBy) {
+    super(message, causedBy);
+  }
 
 }

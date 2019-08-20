@@ -35,9 +35,11 @@ import org.junit.runner.RunWith;
 
 import com.github.advisedtesting.classloader.RestrictiveClassloader;
 import com.github.advisedtesting.junit4.Junit4AopClassRunner;
-import com.github.javakeyring.gnome.GnomeKeyringBackend;
-import com.github.javakeyring.osx.OsxKeychainBackend;
-import com.github.javakeyring.win.WinCredentialStoreBackend;
+import com.github.javakeyring.internal.KeyringBackend;
+import com.github.javakeyring.internal.KeyringBackendFactory;
+import com.github.javakeyring.internal.gnome.GnomeKeyringBackend;
+import com.github.javakeyring.internal.osx.OsxKeychainBackend;
+import com.github.javakeyring.internal.windows.WinCredentialStoreBackend;
 import com.sun.jna.Platform;
 
 /**

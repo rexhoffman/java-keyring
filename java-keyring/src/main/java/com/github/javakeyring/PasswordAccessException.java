@@ -24,30 +24,23 @@
  * (INCLUDING NEGLIGENCE OR OTHERWISE) ARISING IN ANY WAY OUT OF THE USE OF THIS
  * SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
  */
-package com.github.javakeyring.gnome;
-
-import com.sun.jna.Library;
-import com.sun.jna.Pointer;
-import com.sun.jna.ptr.IntByReference;
-import com.sun.jna.ptr.PointerByReference;
+package com.github.javakeyring;
 
 /**
- * GKLib.
+ * Represents an error while retrieving password.
  */
-@SuppressWarnings({"AbbreviationAsWordInName","ParameterName"})
-interface GKLib extends Library {
+public class PasswordAccessException extends Exception {
 
-  int gnome_keyring_unlock_sync(String keyring, String password);
+  private static final long serialVersionUID = 1L;
   
-  int gnome_keyring_item_get_info_full_sync(String keyring, int id, int flags, PointerByReference item_info);
+  /**
+   * Initializes an instance of PasswordRetrievalException.
+   *
+   * @param message
+   *          Error message
+   */
+  public PasswordAccessException(String message) {
+    super(message);
+  }
 
-  void gnome_keyring_item_info_free(Pointer item_info);
-
-  String gnome_keyring_item_info_get_secret(Pointer item_info);
-
-  String gnome_keyring_result_to_message(int r);
-
-  int gnome_keyring_set_network_password_sync(String keyring, String user, String domain, String server, String object,
-      String protocol, String authtype, int port, String password, IntByReference item_id);
-
-}
+} // class PasswordRetrievalException

@@ -33,14 +33,13 @@ package com.github.javakeyring.win;
 import static org.assertj.core.api.Assertions.assertThat;
 import static org.assertj.core.api.Assertions.assertThatThrownBy;
 import static org.assertj.core.api.Assertions.catchThrowable;
-import static org.junit.Assert.assertTrue;
 import static org.junit.Assume.assumeTrue;
 
 import org.junit.Test;
 
 import com.github.javakeyring.BackendNotSupportedException;
-import com.github.javakeyring.PasswordRetrievalException;
-import com.github.javakeyring.win.WinCredentialStoreBackend;
+import com.github.javakeyring.PasswordAccessException;
+import com.github.javakeyring.internal.windows.WinCredentialStoreBackend;
 import com.sun.jna.Platform;
 
 /**
@@ -61,7 +60,7 @@ public class WinCredentialStoreBackendTest {
   @Test
   public void testIsSupported() throws BackendNotSupportedException {
     assumeTrue(Platform.isWindows());
-    assertTrue(new WinCredentialStoreBackend().isSupported());
+    assertThat(new WinCredentialStoreBackend().isSupported()).isTrue();
   }
 
   /**
@@ -75,7 +74,7 @@ public class WinCredentialStoreBackendTest {
     backend.setPassword(SERVICE, ACCOUNT, PASSWORD);
     assertThat(backend.getPassword(SERVICE, ACCOUNT)).isEqualTo(PASSWORD);
     backend.deletePassword(SERVICE, ACCOUNT);
-    assertThatThrownBy(() -> backend.getPassword(SERVICE, ACCOUNT)).isInstanceOf(PasswordRetrievalException.class);
+    assertThatThrownBy(() -> backend.getPassword(SERVICE, ACCOUNT)).isInstanceOf(PasswordAccessException.class);
   }  
 
 }

@@ -24,11 +24,15 @@
  * (INCLUDING NEGLIGENCE OR OTHERWISE) ARISING IN ANY WAY OUT OF THE USE OF THIS
  * SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
  */
-package com.github.javakeyring;
+package com.github.javakeyring.internal;
+
+import com.github.javakeyring.KeyStorePath;
+import com.github.javakeyring.PasswordAccessException;
 
 /**
+ * <p>
  * java-keyring backend interface.
- * 
+ * </p>
  * May also implement {@link KeyStorePath} if there is support for backing files on they file system.
  */
 public interface KeyringBackend {
@@ -50,13 +54,10 @@ public interface KeyringBackend {
    *
    * @return Password related to specified service and account
    *
-   * @throws PasswordRetrievalException
-   *           Thrown when an error happened while getting password
-   *           
-   * @throws LockException
+   * @throws PasswordAccessException
    *           Thrown when an error happened while getting password
    */
-  public String getPassword(String service, String account) throws PasswordRetrievalException;
+  public String getPassword(String service, String account) throws PasswordAccessException;
 
   /**
    * Sets password to key store.
@@ -68,14 +69,11 @@ public interface KeyringBackend {
    * @param password
    *          Password
    *
-   * @throws PasswordSaveException
+   * @throws PasswordAccessException
    *           Thrown when an error happened while saving the password
-   *           
-   * @throws LockException
-   *           Thrown when an error happened while getting password
    */
   public void setPassword(String service, String account, String password)
-      throws PasswordSaveException;
+      throws PasswordAccessException;
 
   /**
    * Deletes password from keystore.
@@ -85,11 +83,8 @@ public interface KeyringBackend {
    * @param account
    *          Account name
    *
-   * @throws PasswordSaveException
+   * @throws PasswordAccessException
    *           Thrown when an error happened while saving the password
-   *           
-   * @throws LockException
-   *           Thrown when an error happened while getting password
    */
-  public void deletePassword(String service, String account) throws PasswordSaveException;
+  public void deletePassword(String service, String account) throws PasswordAccessException;
 }

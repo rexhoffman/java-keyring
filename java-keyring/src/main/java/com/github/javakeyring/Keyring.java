@@ -26,6 +26,9 @@
  */
 package com.github.javakeyring;
 
+import com.github.javakeyring.internal.KeyringBackend;
+import com.github.javakeyring.internal.KeyringBackendFactory;
+
 /**
  * Keyring.
  */
@@ -87,15 +90,15 @@ public class Keyring {
    * @throws UnsupportedOperationException if {@link #isKeyStorePathSupported()} is false;
    */
   public void setKeyStorePath(String path) {
-	if (isKeyStorePathSupported()) {
+    if (isKeyStorePathSupported()) {
       ((KeyStorePath) backend).setKeyStorePath(path);
-	} else {
-	  throw new UnsupportedOperationException(KeyStorePath.class.getSimpleName() + " is not supported on " + getKeyrings());
-	}
+    } else {
+      throw new UnsupportedOperationException(KeyStorePath.class.getSimpleName() + " is not supported on " + getKeyrings());
+    }
   }
 
   public Keyrings getKeyrings() {
-	  return Keyrings.getLabelForBackend(backend.getClass());
+    return Keyrings.getLabelForBackend(backend.getClass());
   }
   
   /**
@@ -118,12 +121,10 @@ public class Keyring {
    *
    * @return Password related to specified service and account
    *
-   * @throws PasswordRetrievalException
+   * @throws PasswordAccessException
    *           Thrown when an error happened while getting password
-   * @throws LockException
-   *           can't establish lock.
    */
-  public String getPassword(String service, String account) throws PasswordRetrievalException {
+  public String getPassword(String service, String account) throws PasswordAccessException {
     return backend.getPassword(service, account);
   }
 
@@ -137,12 +138,10 @@ public class Keyring {
    * @param password
    *          Password
    *
-   * @throws PasswordSaveException
+   * @throws PasswordAccessException
    *           Thrown when an error happened while saving the password
-   * @throws LockException
-   *           can't establish lock.
    */
-  public void setPassword(String service, String account, String password) throws PasswordSaveException {
+  public void setPassword(String service, String account, String password) throws PasswordAccessException {
     backend.setPassword(service, account, password);
   }
   
@@ -154,12 +153,10 @@ public class Keyring {
    * @param account
    *          Account name
    *
-   * @throws PasswordSaveException
+   * @throws PasswordAccessException
    *           Thrown when an error happened while saving the password
-   * @throws LockException
-   *           can't establish lock.
    */
-  public void deletePassword(String service, String account) throws PasswordSaveException {
+  public void deletePassword(String service, String account) throws PasswordAccessException {
     backend.deletePassword(service, account);
   }
 }

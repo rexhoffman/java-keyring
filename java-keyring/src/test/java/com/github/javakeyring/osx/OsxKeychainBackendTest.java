@@ -34,7 +34,8 @@ import static org.junit.Assume.assumeTrue;
 import org.junit.Test;
 
 import com.github.javakeyring.KeyStorePath;
-import com.github.javakeyring.PasswordRetrievalException;
+import com.github.javakeyring.PasswordAccessException;
+import com.github.javakeyring.internal.osx.OsxKeychainBackend;
 import com.sun.jna.Platform;
 
 /**
@@ -87,7 +88,7 @@ public class OsxKeychainBackendTest {
     backend.setPassword(SERVICE, ACCOUNT, PASSWORD);
     assertThat(backend.getPassword(SERVICE, ACCOUNT)).isEqualTo(PASSWORD);
     backend.deletePassword(SERVICE, ACCOUNT);
-    assertThatThrownBy(() -> backend.getPassword(SERVICE, ACCOUNT)).isInstanceOf(PasswordRetrievalException.class);
+    assertThatThrownBy(() -> backend.getPassword(SERVICE, ACCOUNT)).isInstanceOf(PasswordAccessException.class);
   }
 
   private static void checkExistanceOfPasswordEntry(OsxKeychainBackend backend) {

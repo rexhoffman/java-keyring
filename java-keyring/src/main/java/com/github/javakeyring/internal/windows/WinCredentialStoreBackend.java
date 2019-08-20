@@ -24,14 +24,13 @@
  * (INCLUDING NEGLIGENCE OR OTHERWISE) ARISING IN ANY WAY OUT OF THE USE OF THIS
  * SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
  */
-package com.github.javakeyring.win;
+package com.github.javakeyring.internal.windows;
 
 import java.nio.charset.Charset;
 
 import com.github.javakeyring.BackendNotSupportedException;
-import com.github.javakeyring.KeyringBackend;
-import com.github.javakeyring.PasswordRetrievalException;
-import com.github.javakeyring.PasswordSaveException;
+import com.github.javakeyring.PasswordAccessException;
+import com.github.javakeyring.internal.KeyringBackend;
 import com.sun.jna.Memory;
 import com.sun.jna.Platform;
 import com.sun.jna.platform.win32.WinDef.DWORD;
@@ -63,13 +62,13 @@ public class WinCredentialStoreBackend implements KeyringBackend {
   }
 
   @Override
-  public String getPassword(String service, String account) throws PasswordRetrievalException {
+  public String getPassword(String service, String account) throws PasswordAccessException {
     PointerByReference ref = new PointerByReference();
     DWORD type = new DWORD(1L);
     DWORD unused = new DWORD(0L);
     Boolean success = nativeLibraries.getAdvapi32().CredReadA(service, type, unused, ref);
     if (!success) {
-      throw new PasswordRetrievalException("");
+      throw new PasswordAccessException("Error code " + nativeLibraries.getKernel32().GetLastError());
     }
     CREDENTIAL cred = new CREDENTIAL(ref.getValue());
     //TODO: verify username?  or lookup by service & username?
@@ -78,7 +77,7 @@ public class WinCredentialStoreBackend implements KeyringBackend {
       byte[] passbytes = cred.CredentialBlob.getByteArray(0,cred.CredentialBlobSize);
       return new String(passbytes, Charset.forName("UTF-16LE"));    
     } catch (Exception ex) {
-      throw new PasswordRetrievalException(ex.getMessage());
+      throw new PasswordAccessException(ex.getMessage());
     } finally {
       nativeLibraries.getAdvapi32().CredFree(ref);
     }
@@ -86,7 +85,7 @@ public class WinCredentialStoreBackend implements KeyringBackend {
   }
 
   @Override
-  public void setPassword(String service, String account, String password) throws PasswordSaveException {
+  public void setPassword(String service, String account, String password) throws PasswordAccessException {
     CREDENTIAL cred = new CREDENTIAL();
     cred.TargetName = service;
     cred.UserName = account;
@@ -100,12 +99,12 @@ public class WinCredentialStoreBackend implements KeyringBackend {
     Boolean success = nativeLibraries.getAdvapi32().CredWriteA(cred, new DWORD(0));
     passwordMemory.clear();
     if (!success) {
-    	throw new PasswordSaveException("");
+      throw new PasswordAccessException("Error code " + nativeLibraries.getKernel32().GetLastError().intValue());
     }
   }
 
   @Override
-  public void deletePassword(String service, String account) throws PasswordSaveException {
+  public void deletePassword(String service, String account) throws PasswordAccessException {
     boolean success = nativeLibraries.getAdvapi32().CredDeleteA(service, new DWORD(1), new DWORD(0));
     System.out.println(success);    
   }

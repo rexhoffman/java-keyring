@@ -24,28 +24,42 @@
  * (INCLUDING NEGLIGENCE OR OTHERWISE) ARISING IN ANY WAY OUT OF THE USE OF THIS
  * SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
  */
-package com.github.javakeyring.osx;
+package com.github.javakeyring.internal.osx;
 
-import com.sun.jna.Library;
-import com.sun.jna.Pointer;
+import com.github.javakeyring.BackendNotSupportedException;
+import com.sun.jna.Native;
 
 /**
- * OS X CoreFoundation library.
+ * Global native library manager.
  */
-@SuppressWarnings({"MethodName","AbbreviationAsWordInName"})
-interface CoreFoundationLibrary extends Library {
+class NativeLibraryManager {
 
-  public long  // CFIndex
-      CFStringGetLength(
-      Pointer theString); // CFStringRef
+  /**
+   * An instance of CoreFoundationLibrary.
+   */
+  private final CoreFoundationLibrary coreFoundation;
 
-  public char // UniChar
-      CFStringGetCharacterAtIndex(
-      Pointer theString, // CFStringRef
-      long idx); // CFIndex
+  /**
+   * An instance of SecurityLibrary.
+   */
+  private final SecurityLibrary security;
+  
+  public NativeLibraryManager() throws BackendNotSupportedException {
+    try {
+      coreFoundation = (CoreFoundationLibrary) Native.load("CoreFoundation", CoreFoundationLibrary.class);
+      security = (SecurityLibrary) Native.load("Security", SecurityLibrary.class);
+    } catch (UnsatisfiedLinkError ex) {
+      throw new BackendNotSupportedException("Failed to load native library");
+    }
+  }
 
-  public void
-      CFRelease(
-      Pointer cf); // CFTypeRef
+  public CoreFoundationLibrary getCoreFoundation() {
+    return coreFoundation;
+  }
 
+  public SecurityLibrary getSecurity() {
+    return security;
+  }
+  
+  
 }
