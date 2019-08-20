@@ -47,7 +47,7 @@ public class WinCredentialStoreBackend implements KeyringBackend {
    * https://stackoverflow.com/questions/38404517/how-to-map-windows-api-credwrite-credread-in-jna
    */
 
-  NativeLibraryManager nativeLibraries = new NativeLibraryManager();
+  private final NativeLibraryManager nativeLibraries;
 
   public WinCredentialStoreBackend() throws BackendNotSupportedException {
     nativeLibraries = new NativeLibraryManager();
