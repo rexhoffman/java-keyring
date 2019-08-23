@@ -63,9 +63,17 @@ public class KeyringBackendFactory {
    *          should the preferred {@link KeyringStorageType} not support this system.
    */
   public static KeyringBackend create(KeyringStorageType preferred) throws BackendNotSupportedException {
-    KeyringBackend backend = tryToCreateBackend(preferred, true);
-    if (backend == null) {
-      throw new BackendNotSupportedException(String.format("The backend '%s' is not supported", preferred));
+    Exception cause;
+    KeyringBackend backend;
+    try {
+      backend = tryToCreateBackend(preferred, true);
+      cause = null;
+    } catch (Exception ex)  {
+      cause = ex;
+      backend = null;
+    }
+    if (backend == null || cause != null) {
+      throw new BackendNotSupportedException(String.format("The backend '%s' is not supported", preferred), cause);
     }
     return backend;
   }
