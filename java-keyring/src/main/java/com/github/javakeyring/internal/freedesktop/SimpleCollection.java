@@ -33,7 +33,6 @@ import java.security.InvalidKeyException;
 import java.security.NoSuchAlgorithmException;
 import java.security.spec.InvalidKeySpecException;
 import java.util.Arrays;
-import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
 
@@ -70,24 +69,12 @@ public final class SimpleCollection implements AutoCloseable {
 
   private Collection collection;
   private Secret encrypted = null;
-  
-  private final boolean enableUserPrompts;
 
   /**
    * The default collection.
    * @throws IOException if dbus collection can not be accessed.
    */
   public SimpleCollection() throws IOException {
-    this(false);
-  }
-  
-  /**
-   * The default collection.
-   * @param enableUserPrompts should we bother user with prompts
-   * @throws IOException if dbus collection can not be accessed.
-   */
-  public SimpleCollection(boolean enableUserPrompts) throws IOException {
-    this.enableUserPrompts = enableUserPrompts;
     init();
     ObjectPath path = Static.Convert.toObjectPath(Static.ObjectPaths.DEFAULT_COLLECTION);
     this.collection = new Collection(path, service);
@@ -111,9 +98,9 @@ public final class SimpleCollection implements AutoCloseable {
    * @param enableUserPrompts should we bother user with prompts
    * @throws IOException if dbus collection can not be accessed.
    */
+  /*
   @SuppressWarnings("rawtypes")
   public SimpleCollection(String label, CharSequence password, boolean enableUserPrompts) throws IOException {
-    this.enableUserPrompts = enableUserPrompts;
     init();
 
     if (exists(label)) {
@@ -154,6 +141,7 @@ public final class SimpleCollection implements AutoCloseable {
 
     unlock();
   }
+  */
 
   private void init() throws IOException {
     try {
@@ -172,6 +160,7 @@ public final class SimpleCollection implements AutoCloseable {
     }
   }
 
+  /*
   private Map<ObjectPath, String> getLabels() {
     List<ObjectPath> collections = service.getCollections();
 
@@ -203,11 +192,14 @@ public final class SimpleCollection implements AutoCloseable {
     }
     return path;
   }
-
+  */
+  
+  /*
   private final boolean isDefault() {
     List<String> defaults = Arrays.asList(null, "login", "session", "default");
     return defaults.contains(collection.getId());
   }
+  */
 
   private void performPrompt(ObjectPath path) {
     if (!("/".equals(path.getPath()))) {
@@ -230,6 +222,7 @@ public final class SimpleCollection implements AutoCloseable {
     return new Item(Static.Convert.toObjectPath(path), service);
   }
 
+  /*
   private void getUserPermission() throws AccessControlException {
     if (isDefault() && enableUserPrompts) {
       List<ObjectPath> lockable = Arrays.asList(collection.getPath());
@@ -247,6 +240,7 @@ public final class SimpleCollection implements AutoCloseable {
       }
     }
   }
+  */
 
   /**
    * Clears the private key of the transport encryption and the passphrase of the
@@ -271,6 +265,7 @@ public final class SimpleCollection implements AutoCloseable {
    * @throws AccessControlException if user is prompted and refuses.
    * 
    */
+  /*
   public void delete() throws AccessControlException {
     if (!isDefault()) {
       ObjectPath promptPath = collection.delete();
@@ -279,6 +274,7 @@ public final class SimpleCollection implements AutoCloseable {
       throw new AccessControlException("Default collections may not be deleted with the simple API.");
     }
   }
+  */
 
   /**
    * Creates an item with the provided properties in this collection.
@@ -384,10 +380,12 @@ public final class SimpleCollection implements AutoCloseable {
    *
    * @return label
    */
+  /*
   public String getLabel(String objectPath) {
     unlock();
     return getItem(objectPath).getLabel();
   }
+  */
 
   /**
    * Get the user specified attributes of an item.
@@ -400,10 +398,12 @@ public final class SimpleCollection implements AutoCloseable {
    *
    * @return item attributes
    */
+  /*
   public Map<String, String> getAttributes(String objectPath) {
     unlock();
     return getItem(objectPath).getAttributes();
   }
+  */
 
   /**
    * Get the object paths of items with given attributes.
@@ -453,6 +453,7 @@ public final class SimpleCollection implements AutoCloseable {
    * @return Mapping of DBus object paths and plain chars
    * @throws AccessControlException if user is prompted and refuses.
    */
+  /*
   public Map<String, char[]> getSecrets() throws AccessControlException {
     getUserPermission();
 
@@ -466,6 +467,7 @@ public final class SimpleCollection implements AutoCloseable {
 
     return passwords;
   }
+  */
 
   /**
    * Delete an item from this collection.
@@ -475,7 +477,7 @@ public final class SimpleCollection implements AutoCloseable {
    * @throws AccessControlException if user is prompted and refuses.
    */
   public void deleteItem(String objectPath) throws AccessControlException {
-    getUserPermission();
+    //getUserPermission();
 
     Item item = getItem(objectPath);
     ObjectPath promptPath = item.delete();
@@ -489,9 +491,11 @@ public final class SimpleCollection implements AutoCloseable {
    * @param objectPaths The DBus object paths of the items
    * @throws AccessControlException if user is prompted and refuses.
    */
+  /*
   public void deleteItems(List<String> objectPaths) throws AccessControlException {
     for (String item : objectPaths) {
       deleteItem(item);
     }
   }
+  */
 }
