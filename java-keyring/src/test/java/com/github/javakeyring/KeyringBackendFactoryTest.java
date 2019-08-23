@@ -30,14 +30,17 @@ import static org.junit.Assert.assertNotNull;
 import static org.junit.Assert.assertTrue;
 import static org.junit.Assert.fail;
 
+import java.util.stream.Stream;
+
 import org.junit.Test;
 import org.junit.runner.RunWith;
 
+import com.github.advisedtesting.classloader.MinimalPackageSupplier;
 import com.github.advisedtesting.classloader.RestrictiveClassloader;
 import com.github.advisedtesting.junit4.Junit4AopClassRunner;
 import com.github.javakeyring.internal.KeyringBackend;
 import com.github.javakeyring.internal.KeyringBackendFactory;
-import com.github.javakeyring.internal.gnome.GnomeKeyringBackend;
+import com.github.javakeyring.internal.freedesktop.FreedesktopKeyringBackend;
 import com.github.javakeyring.internal.osx.OsxKeychainBackend;
 import com.github.javakeyring.internal.windows.WinCredentialStoreBackend;
 import com.sun.jna.Platform;
@@ -48,11 +51,18 @@ import com.sun.jna.Platform;
 @RunWith(Junit4AopClassRunner.class)
 public class KeyringBackendFactoryTest {
 
+  public static class IgnoredClasses extends MinimalPackageSupplier {
+    @Override
+    public Stream<String> get() {
+      return Stream.concat(super.get(), Stream.of("org.freedesktop")/* DBusConnection, Service */);
+    }
+  }
+  
   /**
    * Test of create method, of class KeyringBackendFactory.
    */
   @Test
-  @RestrictiveClassloader
+  @RestrictiveClassloader(delegatingPackagesSuppliers = IgnoredClasses.class)
   public void testCreateZeroArgs() throws Exception {
     KeyringBackend backend = KeyringBackendFactory.create();
     assertNotNull(backend);
@@ -61,7 +71,7 @@ public class KeyringBackendFactoryTest {
     } else if (Platform.isWindows()) {
       assertTrue(backend instanceof WinCredentialStoreBackend);
     } else if (Platform.isLinux()) {
-      assertTrue(backend instanceof GnomeKeyringBackend);
+      assertTrue(backend instanceof FreedesktopKeyringBackend);
     } else {
       fail("Unsupported platform");
     }

@@ -24,36 +24,29 @@
  * (INCLUDING NEGLIGENCE OR OTHERWISE) ARISING IN ANY WAY OUT OF THE USE OF THIS
  * SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
  */
-package com.github.javakeyring.gnome;
+package com.github.javakeyring.freedesktop;
 
 import static org.assertj.core.api.Assertions.assertThat;
 import static org.assertj.core.api.Assertions.assertThatThrownBy;
 import static org.assertj.core.api.Assertions.catchThrowable;
 import static org.junit.Assume.assumeTrue;
 
-import java.io.File;
-
 import org.junit.Test;
 
-import com.github.javakeyring.KeyStorePath;
 import com.github.javakeyring.PasswordAccessException;
-import com.github.javakeyring.internal.gnome.GnomeKeyringBackend;
+import com.github.javakeyring.internal.freedesktop.FreedesktopKeyringBackend;
 import com.sun.jna.Platform;
 
 /**
  * Test of GnomeKeyringBackend class.
  */
-public class GnomeKeyringBackedTest {
+public class FreedesktopKeyringBackedTest {
 
   private static final String SERVICE = "com.github.javakeyring.gnome.test";
 
   private static final String ACCOUNT = "username_gnome";
 
-  private static final String PASSWORD = "password_gnome";	  
-  
-  private static final String KEYSTORE_PREFIX = "keystore";
-
-  private static final String KEYSTORE_SUFFIX = ".keystore";
+  private static final String PASSWORD = "password_gnome";
 
   /**
    * Test of setup method, of class GnomeKeyringBackend.
@@ -61,16 +54,7 @@ public class GnomeKeyringBackedTest {
   @Test
   public void testSetup() throws Exception {
     assumeTrue(Platform.isLinux());
-    assertThat(catchThrowable(() -> new GnomeKeyringBackend())).as("Setup should succeed").doesNotThrowAnyException();
-  }
-
-  /**
-   * Test of isKeyStorePathRequired method, of class GnomeKeyringBackend.
-   */
-  @Test
-  public void testIsKeyStorePathRequired() throws Exception {
-    assumeTrue(Platform.isLinux());
-    assertThat(new GnomeKeyringBackend()).isInstanceOf(KeyStorePath.class);
+    assertThat(catchThrowable(() -> new FreedesktopKeyringBackend())).as("Setup should succeed").doesNotThrowAnyException();
   }
 
   /**
@@ -79,8 +63,7 @@ public class GnomeKeyringBackedTest {
   @Test
   public void testPasswordFlow() throws Exception {
     assumeTrue(Platform.isLinux());
-    GnomeKeyringBackend backend = new GnomeKeyringBackend();
-    backend.setKeyStorePath(File.createTempFile(KEYSTORE_PREFIX, KEYSTORE_SUFFIX).getPath());
+    FreedesktopKeyringBackend backend = new FreedesktopKeyringBackend();
     catchThrowable(() -> backend.deletePassword(SERVICE, ACCOUNT));
     checkExistanceOfPasswordEntry(backend);
     backend.setPassword(SERVICE, ACCOUNT, PASSWORD);
@@ -89,7 +72,7 @@ public class GnomeKeyringBackedTest {
     assertThatThrownBy(() -> backend.getPassword(SERVICE, ACCOUNT)).isInstanceOf(PasswordAccessException.class);
   }
 
-  private static void checkExistanceOfPasswordEntry(GnomeKeyringBackend backend) {
+  private static void checkExistanceOfPasswordEntry(FreedesktopKeyringBackend backend) {
     assertThatThrownBy(() -> backend.getPassword(SERVICE, ACCOUNT))
        .as("Please remove password entry '%s' " + "by using Keychain Access before running the tests", SERVICE)
        .isNotNull();

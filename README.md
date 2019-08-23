@@ -2,7 +2,7 @@
 
 [![Build Status](https://travis-ci.org/javakeyring/java-keyring.svg?branch=master)](https://travis-ci.org/javakeyring/java-keyring)
 [![Build status](https://ci.appveyor.com/api/projects/status/x0wjmw353hid9ol4?svg=true)](https://ci.appveyor.com/project/rexhoffman/java-keyring)
-[![Maven Site](https://img.shields.io/badge/maven_site-0.1-green.svg)](https://javakeyring.github.io/java-keyring/0.1/)
+[![Maven Site](https://img.shields.io/badge/maven_site-1.0.0-green.svg)](https://javakeyring.github.io/java-keyring/1.0.0/)
 [![Maven Central](https://maven-badges.herokuapp.com/maven-central/com.github.javakeyring/java-keyring/badge.svg)](https://maven-badges.herokuapp.com/maven-central/com.github.javakeyring/java-keyring)
 [![codebeat badge](https://codebeat.co/badges/ebdaafc6-987c-41bd-8902-e277334aac30)](https://codebeat.co/projects/github-com-javakeyring-java-keyring-master)
 [![Codacy Badge](https://api.codacy.com/project/badge/Grade/13a3630bfb6b4bfc90f3e53f838b0ab3)](https://www.codacy.com/app/javakeyring/java-keyring?utm_source=github.com&amp;utm_medium=referral&amp;utm_content=javakeyring/java-keyring&amp;utm_campaign=Badge_Grade)
@@ -33,8 +33,8 @@ Cloned from: [https://bitbucket.org/bpsnervepoint/java-keyring](https://bitbucke
 __Mac OS X__
 *   Passwords are stored using [OS X Keychain](https://support.apple.com/guide/keychain-access/welcome/mac) using [Keychain Services](https://developer.apple.com/documentation/security/keychain_services/keychain_items) api via "Legacy Password Storage". 
   
-__Linux__
-*   Passwords are stored using [GNOME Keyring](https://wiki.gnome.org/Projects/GnomeKeyring) and a supporting data file that uses [ObjectOutputStream](http://docs.oracle.com/javase/6/docs/api/java/io/ObjectOutputStream.html) etc. via [Gnome's Keyring Items](https://developer.gnome.org/gnome-keyring/stable/gnome-keyring-Keyring-Items.html) api, may eventually switch to Freedesktop's Dbus [Secret Service](https://specifications.freedesktop.org/secret-service/).
+__Linux/Freedesktop__
+*   Passwords are stored using [DBus Secret Service](https://specifications.freedesktop.org/secret-service/), you probably used [Seahorse](https://en.wikipedia.org/wiki/Seahorse_(software)).  Connection is made via the excellent [secret-service](https://github.com/swiesend/secret-service) library.
 
 __Windows__
 *   Passwords are stored using [Credential Manager](https://support.microsoft.com/en-us/help/4026814/windows-accessing-credential-manager), exceptions will contain [Error Codes](https://docs.microsoft.com/en-us/windows/win32/debug/system-error-codes).   Access is via the [Wincred](https://docs.microsoft.com/en-us/windows/win32/api/wincred/) api.  
@@ -83,10 +83,9 @@ See the file LICENSE.EAST301 for more details.
 Outstanding work:
 
 *   Windows error message conversion.
-*   Convert Linux support to use dbus secret api.
 *   Provide easy binding for Spring / CDI / etc.
 *   Support for build tools like Maven/Gradle.
-*   Perhaps optional UI requests for passwords (Wincred has an Api at least to prompt users).
+*   Perhaps optional UI requests for passwords (Wincred/secret-service have Apis at least to prompt users).
 *   Convert to Kotlin and test in different Kotlin build target (node/jvm/binary).
 *   Update the osx binding to use non-legacy apis.
 
@@ -99,3 +98,4 @@ java-keyring package contains copy of compiled JNA library.
 Source code of the library is available at its project page.
 
 *   [Java native access (JNA)](https://github.com/twall/jna)
+*   [Secret Service](https://github.com/swiesend/secret-service)

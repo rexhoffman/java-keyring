@@ -26,6 +26,8 @@
  */
 package com.github.javakeyring.internal;
 
+import java.lang.reflect.InvocationTargetException;
+
 import com.github.javakeyring.BackendNotSupportedException;
 import com.github.javakeyring.KeyringStorageType;
 
@@ -43,7 +45,7 @@ public class KeyringBackendFactory {
    */
   public static KeyringBackend create() throws BackendNotSupportedException {
     for (KeyringStorageType keyRing : KeyringStorageType.values()) {
-      KeyringBackend backend = tryToCreateBackend(keyRing);
+      KeyringBackend backend = tryToCreateBackend(keyRing, false);
       if (backend != null) {
         return backend;
       }
@@ -61,7 +63,7 @@ public class KeyringBackendFactory {
    *          should the preferred {@link KeyringStorageType} not support this system.
    */
   public static KeyringBackend create(KeyringStorageType preferred) throws BackendNotSupportedException {
-    KeyringBackend backend = tryToCreateBackend(preferred);
+    KeyringBackend backend = tryToCreateBackend(preferred, true);
     if (backend == null) {
       throw new BackendNotSupportedException(String.format("The backend '%s' is not supported", preferred));
     }
@@ -74,14 +76,18 @@ public class KeyringBackendFactory {
    * @param backendClass
    *          Target backend class
    */
-  private static KeyringBackend tryToCreateBackend(KeyringStorageType keyring) {
+  private static KeyringBackend tryToCreateBackend(KeyringStorageType keyring, boolean throwing)
+      throws BackendNotSupportedException {
     KeyringBackend backend;
     try {
       backend = (KeyringBackend) keyring
               .getSupportingClass()
               .getConstructor(new Class[] {})
               .newInstance(new Object[]{});
-    } catch (Exception ex) {
+    } catch (InvocationTargetException | IllegalAccessException | NoSuchMethodException | InstantiationException ex) {
+      if (throwing) {
+        throw new BackendNotSupportedException("Could not instantiate backend", ex);
+      }
       return null;
     }
     return backend;
