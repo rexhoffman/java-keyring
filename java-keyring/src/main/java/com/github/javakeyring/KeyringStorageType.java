@@ -29,13 +29,13 @@ package com.github.javakeyring;
 import java.util.Arrays;
 
 import com.github.javakeyring.internal.KeyringBackend;
-import com.github.javakeyring.internal.gnome.GnomeKeyringBackend;
+import com.github.javakeyring.internal.freedesktop.FreedesktopKeyringBackend;
 import com.github.javakeyring.internal.osx.OsxKeychainBackend;
 import com.github.javakeyring.internal.windows.WinCredentialStoreBackend;
 
 public enum KeyringStorageType {
   OSX_KEYCHAIN(OsxKeychainBackend.class),
-  GNOME_KEYRING(GnomeKeyringBackend.class),
+  GNOME_KEYRING(FreedesktopKeyringBackend.class),
   WINDOWS_CREDENTIAL_STORE(WinCredentialStoreBackend.class);
   
   private final Class<? extends KeyringBackend> supportingClass;

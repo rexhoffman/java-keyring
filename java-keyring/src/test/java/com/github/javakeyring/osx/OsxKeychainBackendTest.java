@@ -33,7 +33,6 @@ import static org.junit.Assume.assumeTrue;
 
 import org.junit.Test;
 
-import com.github.javakeyring.KeyStorePath;
 import com.github.javakeyring.PasswordAccessException;
 import com.github.javakeyring.internal.osx.OsxKeychainBackend;
 import com.sun.jna.Platform;
@@ -47,7 +46,7 @@ public class OsxKeychainBackendTest {
 
   private static final String ACCOUNT = "username_osx";
 
-  private static final String PASSWORD = "password_osx";	
+  private static final String PASSWORD = "password_osx";
 
   /**
    * Test of setup method, of class OSXKeychainBackend.
@@ -56,15 +55,6 @@ public class OsxKeychainBackendTest {
   public void testSetup() throws Exception {
     assumeTrue(Platform.isMac());
     assertThat(catchThrowable(() -> new OsxKeychainBackend())).as("Setup should succeed").doesNotThrowAnyException();
-  }
-
-  /**
-   * Test of isKeyStorePathRequired method, of class OSXKeychainBackend.
-   */
-  @Test
-  public void testIsKeyStorePathRequired() throws Exception {
-    assumeTrue(Platform.isMac());
-    assertThat(new OsxKeychainBackend()).isNotInstanceOf(KeyStorePath.class);
   }
 
   /**

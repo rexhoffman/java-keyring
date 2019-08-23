@@ -29,7 +29,6 @@ package com.github.javakeyring;
 import static org.assertj.core.api.Assertions.assertThat;
 import static org.assertj.core.api.Assertions.assertThatThrownBy;
 import static org.assertj.core.api.Assertions.catchThrowable;
-import static org.junit.Assert.assertEquals;
 import static org.junit.Assert.assertNotNull;
 
 import org.junit.Test;
@@ -45,7 +44,7 @@ public class KeyringTest {
 
   private static final String ACCOUNT1 = "username1";
 
-  private static final String PASSWORD1 = "password1";
+  private static final String PASSWORD1 = "password1";  
   
   private static final String ACCOUNT2 = "username2";
 
@@ -89,30 +88,6 @@ public class KeyringTest {
           .isInstanceOf(BackendNotSupportedException.class);
     }
   }
-
-  /**
-   * Test of get/setKeyStorePath method, of class Keyring.
-   */
-  @Test
-  public void testSetKeyStorePath() throws Exception {
-    Keyring keyring = Keyring.create();
-    if (keyring.isKeyStorePathSupported()) {
-      keyring.setKeyStorePath("/path/to/keystore");
-      assertEquals("/path/to/keystore", keyring.getKeyStorePath());
-      assertThat(keyring.isKeyStorePathSupported()).isTrue();
-      assertThat(keyring.getKeyringStorageType())
-          .as("Keyring type should be gnome keyring")
-          .isEqualTo(KeyringStorageType.GNOME_KEYRING);
-    } else {
-      assertThat(keyring.getKeyringStorageType())
-          .as("Gnome Keyring should have tested the keystore path")
-          .isNotEqualTo(KeyringStorageType.GNOME_KEYRING);
-      assertThat(keyring.isKeyStorePathSupported()).isFalse();
-      assertThatThrownBy(() -> keyring.getKeyStorePath()).isInstanceOf(UnsupportedOperationException.class);
-      assertThatThrownBy(() -> keyring.setKeyStorePath("")).isInstanceOf(UnsupportedOperationException.class);
-    }
-  }
-
 
   /**
    * Test of getPassword method, of class OSXKeychainBackend.

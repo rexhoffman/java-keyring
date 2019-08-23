@@ -26,8 +26,8 @@
  */
 package com.github.javakeyring.internal;
 
-import static org.assertj.core.api.Assertions.assertThatThrownBy;
 import static org.assertj.core.api.Assertions.assertThat;
+import static org.assertj.core.api.Assertions.assertThatThrownBy;
 
 import org.junit.Test;
 
@@ -35,11 +35,10 @@ import com.github.javakeyring.BackendNotSupportedException;
 
 public class KeyringBackendFactoryTest {
 
-	@Test
-	public void testKeyringBackendFactory() throws BackendNotSupportedException {
-		assertThatThrownBy(() -> KeyringBackendFactory.create(null)).isInstanceOf(BackendNotSupportedException.class);
-		assertThat(KeyringBackendFactory.create()).isNotNull();
-	}
-	
-	
+  @Test
+  public void testKeyringBackendFactory() throws BackendNotSupportedException {
+    assertThatThrownBy(() -> KeyringBackendFactory.create(null)).isInstanceOf(BackendNotSupportedException.class);
+    assertThat(KeyringBackendFactory.create()).isNotNull();
+  }
+
 }

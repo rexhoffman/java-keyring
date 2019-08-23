@@ -6,7 +6,7 @@
     <parent>
         <groupId>com.github.javakeyring</groupId>
         <artifactId>java-keyring-parent</artifactId>
-        <version>0.2-SNAPSHOT</version>
+        <version>1.0.0</version>
     </parent>
     <artifactId>java-keyring</artifactId>
     <packaging>jar</packaging>
@@ -22,12 +22,28 @@
 
     <dependencies>
         <dependency>
+            <groupId>de.swiesend</groupId>
+            <artifactId>secret-service</artifactId>
+            <version>1.0.0-RC.3</version>
+            <exclusions>
+                <exclusion>
+                    <groupId>org.slf4j</groupId>
+                    <artifactId>slf4j-api</artifactId>
+                </exclusion>
+            </exclusions>
+        </dependency>
+        <dependency>
             <groupId>net.java.dev.jna</groupId>
             <artifactId>jna</artifactId>
         </dependency>
         <dependency>
             <groupId>net.java.dev.jna</groupId>
             <artifactId>jna-platform</artifactId>
+        </dependency>
+        <dependency>
+            <groupId>org.slf4j</groupId>
+            <artifactId>slf4j-api</artifactId>
+            <version>1.7.26</version>
         </dependency>
         <dependency>
             <groupId>com.github.advisedtesting</groupId>

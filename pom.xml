@@ -10,7 +10,7 @@
 
     <groupId>com.github.javakeyring</groupId>
     <artifactId>java-keyring-parent</artifactId>
-    <version>0.2-SNAPSHOT</version>
+    <version>1.0.0</version>
     <packaging>pom</packaging>
     <name>java-keyring-parent</name>
     <description>A Java library to store password securely</description>

@@ -26,7 +26,6 @@
  */
 package com.github.javakeyring.internal;
 
-import com.github.javakeyring.KeyStorePath;
 import com.github.javakeyring.PasswordAccessException;
 
 /**
