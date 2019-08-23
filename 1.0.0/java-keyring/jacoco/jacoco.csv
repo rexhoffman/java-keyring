@@ -1,0 +1,13 @@
+GROUP,PACKAGE,CLASS,INSTRUCTION_MISSED,INSTRUCTION_COVERED,BRANCH_MISSED,BRANCH_COVERED,LINE_MISSED,LINE_COVERED,COMPLEXITY_MISSED,COMPLEXITY_COVERED,METHOD_MISSED,METHOD_COVERED
+java-keyring,com.github.javakeyring,KeyringStorageType,34,48,2,0,5,8,4,3,3,3
+java-keyring,com.github.javakeyring,PasswordAccessException,0,4,0,0,0,2,0,1,0,1
+java-keyring,com.github.javakeyring,BackendNotSupportedException,4,5,0,0,2,2,1,1,1,1
+java-keyring,com.github.javakeyring,Keyring,5,36,0,0,1,10,1,6,1,6
+java-keyring,com.github.javakeyring.internal.osx,OsxKeychainBackend,23,257,4,18,4,47,4,12,0,5
+java-keyring,com.github.javakeyring.internal.osx,NativeLibraryManager,6,22,0,0,2,7,0,3,0,3
+java-keyring,com.github.javakeyring.internal.windows,WinCredentialStoreBackend,228,2,6,0,34,1,6,1,3,1
+java-keyring,com.github.javakeyring.internal.windows,NativeLibraryManager,20,9,0,0,6,3,2,1,2,1
+java-keyring,com.github.javakeyring.internal.windows,CREDENTIAL,61,0,0,0,5,0,3,0,3,0
+java-keyring,com.github.javakeyring.internal.freedesktop,FreedesktopKeyringBackend,191,9,16,0,37,3,16,1,8,1
+java-keyring,com.github.javakeyring.internal.freedesktop,SimpleCollection,293,29,30,0,83,9,26,2,11,2
+java-keyring,com.github.javakeyring.internal,KeyringBackendFactory,12,75,4,6,3,22,5,4,1,3
