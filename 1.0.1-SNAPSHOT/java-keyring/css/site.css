@@ -1,0 +1,58 @@
+/* https://developers.google.com/fonts/docs/getting_started */
+@import url(./titillium-style.css);
+@import url(./neuropol-style.css);
+
+/* cloud-vector.jpg came from http://www.clker.com/clipart-238112.html converted by Base64Encode.java */
+@import url(./cloud-vector.css);
+
+body {
+	background-repeat: no-repeat;
+	background-position: center;
+	background-attachment: fixed;
+	background-size: cover;
+	min-height: 100%;
+}
+
+#bodyColumn {
+	padding: 14px;
+}
+
+.breadcrumb, #bodyColumn, .sidebar-nav, footer {
+	background-color: #f2f2f2;
+	border: 1px solid #e3e3e3;
+	border-radius: 4px;
+	box-shadow: inset 0 1px 1px rgba(0, 0, 0, 0.05);
+	filter: alpha(opacity = 90);
+	opacity: 0.9;
+}
+
+a.brand, #bannerLeft h2 {
+	font-family: 'Neuropol', sans-serif;
+}
+
+.button a, a.button, h3, h2, #leftColumn ul, #bodyColumn ul {
+	font-family: 'TitilliumText22L-Regular', sans-serif;
+}
+
+.button a, a.button, h2, h1, h3 {
+	color: #538ed6
+}
+
+#bannerLeft h2 {
+	color: #f2f2f2;
+}
+
+hr {
+	visibility: hidden;
+}
+
+container-fluid::after {
+	height: 40px;
+}
+
+footer {
+  position: fixed;
+  bottom: 0;
+  left: 0;
+  width: 100%;
+}
