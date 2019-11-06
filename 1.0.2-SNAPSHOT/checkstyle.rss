@@ -1,0 +1,390 @@
+<?xml version="1.0" encoding="ISO-8859-1"?>
+<!--
+Licensed to the Apache Software Foundation (ASF) under one
+or more contributor license agreements.  See the NOTICE file
+distributed with this work for additional information
+regarding copyright ownership.  The ASF licenses this file
+to you under the Apache License, Version 2.0 (the
+"License"); you may not use this file except in compliance
+with the License.  You may obtain a copy of the License at
+
+  http://www.apache.org/licenses/LICENSE-2.0
+
+Unless required by applicable law or agreed to in writing,
+software distributed under the License is distributed on an
+"AS IS" BASIS, WITHOUT WARRANTIES OR CONDITIONS OF ANY
+KIND, either express or implied.  See the License for the
+specific language governing permissions and limitations
+under the License.
+-->
+<rss version="0.91">
+  <channel>
+    <title>java-keyring-parent - Checkstyle report</title>
+    <link>https://github.com/javakeyring/java-keyring/MavenParent/java-keyring-parent/</link>
+    <description>java-keyring-parent - Checkstyle report</description>
+    <language>en-us</language>
+    <copyright>&#169;2019 Java Keyring</copyright>
+    <item>
+      <title>File: 24,
+             Errors: 0,
+             Warnings: 20,
+             Infos: 0
+      </title>
+            <link>https://github.com/javakeyring/java-keyring/MavenParent/java-keyring-parent//checkstyle.html</link>
+      <description>
+        <p>Click <a href="https://github.com/javakeyring/java-keyring/MavenParent/java-keyring-parent//checkstyle.html">here</a> for the full Checkstyle report.</p>
+
+        <table summary="Files" boder="1">
+          <thead>
+            <tr>
+              <th>Files</th>
+              <th style="width:30px;"><abbr title="Info">I</abbr></th>
+              <th style="width:30px;"><abbr title="Warning">W</abbr></th>
+              <th style="width:30px;"><abbr title="Error">E</abbr></th>
+            </tr>
+          </thead>
+          <tbody>
+                          <tr>
+                <td>
+                  <a href="https://github.com/javakeyring/java-keyring/MavenParent/java-keyring-parent//checkstyle.html#com.github.javakeyring.KeyringTest.java">com/github/javakeyring/KeyringTest.java</a>
+                </td>
+                <td>
+                  0
+                </td>
+                <td>
+                  0
+                </td>
+                <td>
+                  0
+                </td>
+              </tr>
+                          <tr>
+                <td>
+                  <a href="https://github.com/javakeyring/java-keyring/MavenParent/java-keyring-parent//checkstyle.html#com.github.javakeyring.internal.windows.NativeLibraryManager.java">com/github/javakeyring/internal/windows/NativeLibraryManager.java</a>
+                </td>
+                <td>
+                  0
+                </td>
+                <td>
+                  0
+                </td>
+                <td>
+                  0
+                </td>
+              </tr>
+                          <tr>
+                <td>
+                  <a href="https://github.com/javakeyring/java-keyring/MavenParent/java-keyring-parent//checkstyle.html#com.github.javakeyring.win.CorruptedHeapTest.java">com/github/javakeyring/win/CorruptedHeapTest.java</a>
+                </td>
+                <td>
+                  0
+                </td>
+                <td>
+                  19
+                </td>
+                <td>
+                  0
+                </td>
+              </tr>
+                          <tr>
+                <td>
+                  <a href="https://github.com/javakeyring/java-keyring/MavenParent/java-keyring-parent//checkstyle.html#com.github.javakeyring.freedesktop.FreedesktopKeyringBackedTest.java">com/github/javakeyring/freedesktop/FreedesktopKeyringBackedTest.java</a>
+                </td>
+                <td>
+                  0
+                </td>
+                <td>
+                  0
+                </td>
+                <td>
+                  0
+                </td>
+              </tr>
+                          <tr>
+                <td>
+                  <a href="https://github.com/javakeyring/java-keyring/MavenParent/java-keyring-parent//checkstyle.html#com.github.javakeyring.Keyring.java">com/github/javakeyring/Keyring.java</a>
+                </td>
+                <td>
+                  0
+                </td>
+                <td>
+                  0
+                </td>
+                <td>
+                  0
+                </td>
+              </tr>
+                          <tr>
+                <td>
+                  <a href="https://github.com/javakeyring/java-keyring/MavenParent/java-keyring-parent//checkstyle.html#com.github.javakeyring.internal.freedesktop.SimpleCollection.java">com/github/javakeyring/internal/freedesktop/SimpleCollection.java</a>
+                </td>
+                <td>
+                  0
+                </td>
+                <td>
+                  0
+                </td>
+                <td>
+                  0
+                </td>
+              </tr>
+                          <tr>
+                <td>
+                  <a href="https://github.com/javakeyring/java-keyring/MavenParent/java-keyring-parent//checkstyle.html#com.github.javakeyring.KeyringBackendFactoryTest.java">com/github/javakeyring/KeyringBackendFactoryTest.java</a>
+                </td>
+                <td>
+                  0
+                </td>
+                <td>
+                  0
+                </td>
+                <td>
+                  0
+                </td>
+              </tr>
+                          <tr>
+                <td>
+                  <a href="https://github.com/javakeyring/java-keyring/MavenParent/java-keyring-parent//checkstyle.html#com.github.javakeyring.internal.osx.NativeLibraryManager.java">com/github/javakeyring/internal/osx/NativeLibraryManager.java</a>
+                </td>
+                <td>
+                  0
+                </td>
+                <td>
+                  0
+                </td>
+                <td>
+                  0
+                </td>
+              </tr>
+                          <tr>
+                <td>
+                  <a href="https://github.com/javakeyring/java-keyring/MavenParent/java-keyring-parent//checkstyle.html#com.github.javakeyring.internal.osx.SecurityLibrary.java">com/github/javakeyring/internal/osx/SecurityLibrary.java</a>
+                </td>
+                <td>
+                  0
+                </td>
+                <td>
+                  0
+                </td>
+                <td>
+                  0
+                </td>
+              </tr>
+                          <tr>
+                <td>
+                  <a href="https://github.com/javakeyring/java-keyring/MavenParent/java-keyring-parent//checkstyle.html#com.github.javakeyring.internal.windows.WinCredentialStoreBackend.java">com/github/javakeyring/internal/windows/WinCredentialStoreBackend.java</a>
+                </td>
+                <td>
+                  0
+                </td>
+                <td>
+                  0
+                </td>
+                <td>
+                  0
+                </td>
+              </tr>
+                          <tr>
+                <td>
+                  <a href="https://github.com/javakeyring/java-keyring/MavenParent/java-keyring-parent//checkstyle.html#com.github.javakeyring.internal.windows.Advapi32.java">com/github/javakeyring/internal/windows/Advapi32.java</a>
+                </td>
+                <td>
+                  0
+                </td>
+                <td>
+                  0
+                </td>
+                <td>
+                  0
+                </td>
+              </tr>
+                          <tr>
+                <td>
+                  <a href="https://github.com/javakeyring/java-keyring/MavenParent/java-keyring-parent//checkstyle.html#com.github.javakeyring.win.WinCredentialStoreBackendTest.java">com/github/javakeyring/win/WinCredentialStoreBackendTest.java</a>
+                </td>
+                <td>
+                  0
+                </td>
+                <td>
+                  0
+                </td>
+                <td>
+                  0
+                </td>
+              </tr>
+                          <tr>
+                <td>
+                  <a href="https://github.com/javakeyring/java-keyring/MavenParent/java-keyring-parent//checkstyle.html#com.github.javakeyring.internal.osx.OsxKeychainBackend.java">com/github/javakeyring/internal/osx/OsxKeychainBackend.java</a>
+                </td>
+                <td>
+                  0
+                </td>
+                <td>
+                  0
+                </td>
+                <td>
+                  0
+                </td>
+              </tr>
+                          <tr>
+                <td>
+                  <a href="https://github.com/javakeyring/java-keyring/MavenParent/java-keyring-parent//checkstyle.html#com.github.javakeyring.BackendNotSupportedException.java">com/github/javakeyring/BackendNotSupportedException.java</a>
+                </td>
+                <td>
+                  0
+                </td>
+                <td>
+                  0
+                </td>
+                <td>
+                  0
+                </td>
+              </tr>
+                          <tr>
+                <td>
+                  <a href="https://github.com/javakeyring/java-keyring/MavenParent/java-keyring-parent//checkstyle.html#com.github.javakeyring.KeyringStorageType.java">com/github/javakeyring/KeyringStorageType.java</a>
+                </td>
+                <td>
+                  0
+                </td>
+                <td>
+                  0
+                </td>
+                <td>
+                  0
+                </td>
+              </tr>
+                          <tr>
+                <td>
+                  <a href="https://github.com/javakeyring/java-keyring/MavenParent/java-keyring-parent//checkstyle.html#com.github.javakeyring.internal.osx.CoreFoundationLibrary.java">com/github/javakeyring/internal/osx/CoreFoundationLibrary.java</a>
+                </td>
+                <td>
+                  0
+                </td>
+                <td>
+                  0
+                </td>
+                <td>
+                  0
+                </td>
+              </tr>
+                          <tr>
+                <td>
+                  <a href="https://github.com/javakeyring/java-keyring/MavenParent/java-keyring-parent//checkstyle.html#com.github.javakeyring.PasswordAccessException.java">com/github/javakeyring/PasswordAccessException.java</a>
+                </td>
+                <td>
+                  0
+                </td>
+                <td>
+                  0
+                </td>
+                <td>
+                  0
+                </td>
+              </tr>
+                          <tr>
+                <td>
+                  <a href="https://github.com/javakeyring/java-keyring/MavenParent/java-keyring-parent//checkstyle.html#com.github.javakeyring.osx.OsxKeychainBackendTest.java">com/github/javakeyring/osx/OsxKeychainBackendTest.java</a>
+                </td>
+                <td>
+                  0
+                </td>
+                <td>
+                  0
+                </td>
+                <td>
+                  0
+                </td>
+              </tr>
+                          <tr>
+                <td>
+                  <a href="https://github.com/javakeyring/java-keyring/MavenParent/java-keyring-parent//checkstyle.html#com.github.javakeyring.internal.windows.CREDENTIAL.java">com/github/javakeyring/internal/windows/CREDENTIAL.java</a>
+                </td>
+                <td>
+                  0
+                </td>
+                <td>
+                  1
+                </td>
+                <td>
+                  0
+                </td>
+              </tr>
+                          <tr>
+                <td>
+                  <a href="https://github.com/javakeyring/java-keyring/MavenParent/java-keyring-parent//checkstyle.html#com.github.javakeyring.internal.windows.Kernel32.java">com/github/javakeyring/internal/windows/Kernel32.java</a>
+                </td>
+                <td>
+                  0
+                </td>
+                <td>
+                  0
+                </td>
+                <td>
+                  0
+                </td>
+              </tr>
+                          <tr>
+                <td>
+                  <a href="https://github.com/javakeyring/java-keyring/MavenParent/java-keyring-parent//checkstyle.html#com.github.javakeyring.internal.KeyringBackendFactoryTest.java">com/github/javakeyring/internal/KeyringBackendFactoryTest.java</a>
+                </td>
+                <td>
+                  0
+                </td>
+                <td>
+                  0
+                </td>
+                <td>
+                  0
+                </td>
+              </tr>
+                          <tr>
+                <td>
+                  <a href="https://github.com/javakeyring/java-keyring/MavenParent/java-keyring-parent//checkstyle.html#com.github.javakeyring.internal.KeyringBackendFactory.java">com/github/javakeyring/internal/KeyringBackendFactory.java</a>
+                </td>
+                <td>
+                  0
+                </td>
+                <td>
+                  0
+                </td>
+                <td>
+                  0
+                </td>
+              </tr>
+                          <tr>
+                <td>
+                  <a href="https://github.com/javakeyring/java-keyring/MavenParent/java-keyring-parent//checkstyle.html#com.github.javakeyring.internal.freedesktop.FreedesktopKeyringBackend.java">com/github/javakeyring/internal/freedesktop/FreedesktopKeyringBackend.java</a>
+                </td>
+                <td>
+                  0
+                </td>
+                <td>
+                  0
+                </td>
+                <td>
+                  0
+                </td>
+              </tr>
+                          <tr>
+                <td>
+                  <a href="https://github.com/javakeyring/java-keyring/MavenParent/java-keyring-parent//checkstyle.html#com.github.javakeyring.internal.KeyringBackend.java">com/github/javakeyring/internal/KeyringBackend.java</a>
+                </td>
+                <td>
+                  0
+                </td>
+                <td>
+                  0
+                </td>
+                <td>
+                  0
+                </td>
+              </tr>
+                      </tbody>
+        </table>
+        
+      </description>
+    </item>
+  </channel>
+</rss>
+
