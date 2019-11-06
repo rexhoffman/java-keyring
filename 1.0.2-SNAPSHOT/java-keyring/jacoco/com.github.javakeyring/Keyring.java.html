@@ -1,0 +1,125 @@
+<?xml version="1.0" encoding="UTF-8"?><!DOCTYPE html PUBLIC "-//W3C//DTD XHTML 1.0 Strict//EN" "http://www.w3.org/TR/xhtml1/DTD/xhtml1-strict.dtd"><html xmlns="http://www.w3.org/1999/xhtml" lang="en"><head><meta http-equiv="Content-Type" content="text/html;charset=UTF-8"/><link rel="stylesheet" href="../jacoco-resources/report.css" type="text/css"/><link rel="shortcut icon" href="../jacoco-resources/report.gif" type="image/gif"/><title>Keyring.java</title><link rel="stylesheet" href="../jacoco-resources/prettify.css" type="text/css"/><script type="text/javascript" src="../jacoco-resources/prettify.js"></script></head><body onload="window['PR_TAB_WIDTH']=4;prettyPrint()"><div class="breadcrumb" id="breadcrumb"><span class="info"><a href="../jacoco-sessions.html" class="el_session">Sessions</a></span><a href="../index.html" class="el_report">java-keyring</a> &gt; <a href="index.source.html" class="el_package">com.github.javakeyring</a> &gt; <span class="el_source">Keyring.java</span></div><h1>Keyring.java</h1><pre class="source lang-java linenums">/*
+ * Copyright © 2019, Java Keyring
+ * All rights reserved.
+ *
+ * Redistribution and use in source and binary forms, with or without
+ * modification, are permitted provided that the following conditions are met:
+ *     * Redistributions of source code must retain the above copyright
+ *       notice, this list of conditions and the following disclaimer.
+ *     * Redistributions in binary form must reproduce the above copyright
+ *       notice, this list of conditions and the following disclaimer in the
+ *       documentation and/or other materials provided with the distribution.
+ *     * Neither the name of the &lt;organization&gt; nor the
+ *       names of its contributors may be used to endorse or promote products
+ *       derived from this software without specific prior written permission.
+ *
+ * THIS SOFTWARE IS PROVIDED BY THE COPYRIGHT HOLDERS AND CONTRIBUTORS &quot;AS IS&quot; AND
+ * ANY EXPRESS OR IMPLIED WARRANTIES, INCLUDING, BUT NOT LIMITED TO, THE IMPLIED
+ * WARRANTIES OF MERCHANTABILITY AND FITNESS FOR A PARTICULAR PURPOSE ARE
+ * DISCLAIMED. IN NO EVENT SHALL &lt;COPYRIGHT HOLDER&gt; BE LIABLE FOR ANY
+ * DIRECT, INDIRECT, INCIDENTAL, SPECIAL, EXEMPLARY, OR CONSEQUENTIAL DAMAGES
+ * (INCLUDING, BUT NOT LIMITED TO, PROCUREMENT OF SUBSTITUTE GOODS OR SERVICES;
+ * LOSS OF USE, DATA, OR PROFITS; OR BUSINESS INTERRUPTION) HOWEVER CAUSED AND
+ * ON ANY THEORY OF LIABILITY, WHETHER IN CONTRACT, STRICT LIABILITY, OR TORT
+ * (INCLUDING NEGLIGENCE OR OTHERWISE) ARISING IN ANY WAY OUT OF THE USE OF THIS
+ * SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
+ */
+package com.github.javakeyring;
+
+import com.github.javakeyring.internal.KeyringBackend;
+import com.github.javakeyring.internal.KeyringBackendFactory;
+
+/**
+ * Keyring.
+ */
+public class Keyring {
+
+  /**
+   * Keyring Storage Back end.
+   */
+  private final KeyringBackend backend;
+  
+  /**
+   * Creates an instance of Keyring using the a default backed based on operating system.
+   * 
+   * @return a functional Keyring or a BackendNotSupportedException is thrown.
+   * @throws BackendNotSupportedException if the default backend for the operating system is unsupported.
+   */
+  public static Keyring create() throws BackendNotSupportedException {
+<span class="fc" id="L49">    return new Keyring(KeyringBackendFactory.create());</span>
+  }
+
+  /**
+   * Creates an instance of Keyring with specified backend.
+   *
+   * @param keyring desired backend.
+   * @return a functional Keyring or a BackendNotSupportedException is thrown.
+   * @throws BackendNotSupportedException if the default backend for the operating system is unsupported.
+   */
+  public static Keyring create(KeyringStorageType keyring) throws BackendNotSupportedException {
+<span class="fc" id="L60">    return new Keyring(KeyringBackendFactory.create(keyring));</span>
+  }
+
+  /**
+   * Initializes an instance of Keyring.
+   *
+   * @param backend Keyring backend instance
+   */
+<span class="fc" id="L68">  private Keyring(KeyringBackend backend) {</span>
+<span class="fc" id="L69">    this.backend = backend;</span>
+<span class="fc" id="L70">  }</span>
+
+  public KeyringStorageType getKeyringStorageType() {
+<span class="nc" id="L73">    return KeyringStorageType.getLabelForBackend(backend.getClass());</span>
+  }
+
+  /**
+   * Gets password from key store (Proxy method of KeyringBackend.getPassword).
+   *
+   * @param service
+   *          Service name
+   * @param account
+   *          Account name
+   *
+   * @return Password related to specified service and account
+   *
+   * @throws PasswordAccessException
+   *           Thrown when an error happened while getting password
+   */
+  public String getPassword(String service, String account) throws PasswordAccessException {
+<span class="fc" id="L90">    return backend.getPassword(service, account);</span>
+  }
+
+  /**
+   * Sets password to key store (Proxy method of KeyringBackend.setPassword)
+   *
+   * @param service
+   *          Service name
+   * @param account
+   *          Account name
+   * @param password
+   *          Password
+   *
+   * @throws PasswordAccessException
+   *           Thrown when an error happened while saving the password
+   */
+  public void setPassword(String service, String account, String password) throws PasswordAccessException {
+<span class="fc" id="L107">    backend.setPassword(service, account, password);</span>
+<span class="fc" id="L108">  }</span>
+  
+  /**
+   * Sets password to key store (Proxy method of KeyringBackend.setPassword)
+   *
+   * @param service
+   *          Service name
+   * @param account
+   *          Account name
+   *
+   * @throws PasswordAccessException
+   *           Thrown when an error happened while saving the password
+   */
+  public void deletePassword(String service, String account) throws PasswordAccessException {
+<span class="fc" id="L122">    backend.deletePassword(service, account);</span>
+<span class="fc" id="L123">  }</span>
+}
+</pre><div class="footer"><span class="right">Created with <a href="http://www.jacoco.org/jacoco">JaCoCo</a> 0.8.4.201905082037</span></div></body></html>

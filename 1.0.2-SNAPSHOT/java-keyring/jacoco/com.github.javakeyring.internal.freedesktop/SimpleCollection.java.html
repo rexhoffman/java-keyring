@@ -1,0 +1,498 @@
+<?xml version="1.0" encoding="UTF-8"?><!DOCTYPE html PUBLIC "-//W3C//DTD XHTML 1.0 Strict//EN" "http://www.w3.org/TR/xhtml1/DTD/xhtml1-strict.dtd"><html xmlns="http://www.w3.org/1999/xhtml" lang="en"><head><meta http-equiv="Content-Type" content="text/html;charset=UTF-8"/><link rel="stylesheet" href="../jacoco-resources/report.css" type="text/css"/><link rel="shortcut icon" href="../jacoco-resources/report.gif" type="image/gif"/><title>SimpleCollection.java</title><link rel="stylesheet" href="../jacoco-resources/prettify.css" type="text/css"/><script type="text/javascript" src="../jacoco-resources/prettify.js"></script></head><body onload="window['PR_TAB_WIDTH']=4;prettyPrint()"><div class="breadcrumb" id="breadcrumb"><span class="info"><a href="../jacoco-sessions.html" class="el_session">Sessions</a></span><a href="../index.html" class="el_report">java-keyring</a> &gt; <a href="index.source.html" class="el_package">com.github.javakeyring.internal.freedesktop</a> &gt; <span class="el_source">SimpleCollection.java</span></div><h1>SimpleCollection.java</h1><pre class="source lang-java linenums">/*
+ * Copyright © 2019, Java Keyring
+ * All rights reserved.
+ *
+ * Redistribution and use in source and binary forms, with or without
+ * modification, are permitted provided that the following conditions are met:
+ *     * Redistributions of source code must retain the above copyright
+ *       notice, this list of conditions and the following disclaimer.
+ *     * Redistributions in binary form must reproduce the above copyright
+ *       notice, this list of conditions and the following disclaimer in the
+ *       documentation and/or other materials provided with the distribution.
+ *     * Neither the name of the &lt;organization&gt; nor the
+ *       names of its contributors may be used to endorse or promote products
+ *       derived from this software without specific prior written permission.
+ *
+ * THIS SOFTWARE IS PROVIDED BY THE COPYRIGHT HOLDERS AND CONTRIBUTORS &quot;AS IS&quot; AND
+ * ANY EXPRESS OR IMPLIED WARRANTIES, INCLUDING, BUT NOT LIMITED TO, THE IMPLIED
+ * WARRANTIES OF MERCHANTABILITY AND FITNESS FOR A PARTICULAR PURPOSE ARE
+ * DISCLAIMED. IN NO EVENT SHALL &lt;COPYRIGHT HOLDER&gt; BE LIABLE FOR ANY
+ * DIRECT, INDIRECT, INCIDENTAL, SPECIAL, EXEMPLARY, OR CONSEQUENTIAL DAMAGES
+ * (INCLUDING, BUT NOT LIMITED TO, PROCUREMENT OF SUBSTITUTE GOODS OR SERVICES;
+ * LOSS OF USE, DATA, OR PROFITS; OR BUSINESS INTERRUPTION) HOWEVER CAUSED AND
+ * ON ANY THEORY OF LIABILITY, WHETHER IN CONTRACT, STRICT LIABILITY, OR TORT
+ * (INCLUDING NEGLIGENCE OR OTHERWISE) ARISING IN ANY WAY OUT OF THE USE OF THIS
+ * SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
+ */
+package com.github.javakeyring.internal.freedesktop;
+
+import java.io.IOException;
+import java.security.AccessControlException;
+import java.security.InvalidAlgorithmParameterException;
+import java.security.InvalidKeyException;
+import java.security.NoSuchAlgorithmException;
+import java.security.spec.InvalidKeySpecException;
+import java.util.Arrays;
+import java.util.List;
+import java.util.Map;
+
+import javax.crypto.BadPaddingException;
+import javax.crypto.IllegalBlockSizeException;
+import javax.crypto.NoSuchPaddingException;
+
+import org.freedesktop.dbus.DBusPath;
+import org.freedesktop.dbus.ObjectPath;
+import org.freedesktop.dbus.exceptions.DBusException;
+import org.freedesktop.dbus.types.Variant;
+import org.freedesktop.secret.Collection;
+import org.freedesktop.secret.Item;
+import org.freedesktop.secret.Pair;
+import org.freedesktop.secret.Prompt;
+import org.freedesktop.secret.Secret;
+import org.freedesktop.secret.Service;
+import org.freedesktop.secret.Session;
+import org.freedesktop.secret.Static;
+import org.freedesktop.secret.TransportEncryption;
+import org.freedesktop.secret.interfaces.Prompt.Completed;
+import org.gnome.keyring.InternalUnsupportedGuiltRiddenInterface;
+
+/**
+ * A clone of {@link org.freedesktop.secret.simple.SimpleCollection}, with the prompting capability removed.
+ */
+public final class SimpleCollection implements AutoCloseable {
+
+<span class="fc" id="L64">  private TransportEncryption encryption = null;</span>
+<span class="fc" id="L65">  private Service service = null;</span>
+<span class="fc" id="L66">  private Session session = null;</span>
+<span class="fc" id="L67">  private Prompt prompt = null;</span>
+<span class="fc" id="L68">  private InternalUnsupportedGuiltRiddenInterface withoutPrompt = null;</span>
+
+  private Collection collection;
+<span class="fc" id="L71">  private Secret encrypted = null;</span>
+
+  /**
+   * The default collection.
+   * @throws IOException if dbus collection can not be accessed.
+   */
+<span class="fc" id="L77">  public SimpleCollection() throws IOException {</span>
+<span class="nc" id="L78">    init();</span>
+<span class="nc" id="L79">    ObjectPath path = Static.Convert.toObjectPath(Static.ObjectPaths.DEFAULT_COLLECTION);</span>
+<span class="nc" id="L80">    this.collection = new Collection(path, service);</span>
+<span class="nc" id="L81">    unlock();</span>
+<span class="nc" id="L82">  }</span>
+
+  /*
+   * A user specified collection.
+   *
+   * @param label    The displayable label of the collection
+   * &lt;p&gt;
+   *                 NOTE: The 'label' of a collection may differ from the 'id' of
+   *                 a collection. The 'id' is assigned by the Secret Service and
+   *                 used in the DBus object path of a collection or item.
+   * &lt;/p&gt;
+   * &lt;p&gt;
+   *                 A SimpleCollection can't handle collections with the same
+   *                 label, but different ids correctly.
+   * &lt;/p&gt;                
+   * @param password Password of the collection
+   * @throws IOException if dbus collection can not be accessed.
+   *
+  /*
+  @SuppressWarnings(&quot;rawtypes&quot;)
+  public SimpleCollection(String label, CharSequence password) throws IOException {
+    init();
+
+    if (exists(label)) {
+      ObjectPath path = getCollectionPath(label);
+      this.collection = new Collection(path, service);
+    } else {
+      DBusPath path = null;
+      Map&lt;String, Variant&gt; properties = Collection.createProperties(label);
+
+      if (password == null) {
+        Pair&lt;ObjectPath, ObjectPath&gt; response = service.createCollection(properties);
+        if (!&quot;/&quot;.equals(response.a.getPath())) {
+          path = response.a;
+        }
+        performPrompt(response.b);
+      } else {
+        try {
+          encrypted = encryption.encrypt(password);
+          path = withoutPrompt.createWithMasterPassword(properties, encrypted);
+        } catch (NoSuchAlgorithmException | NoSuchPaddingException | InvalidAlgorithmParameterException
+            | InvalidKeyException | BadPaddingException | IllegalBlockSizeException ex) {
+          // log.error(e.toString(), e.getCause());
+        }
+      }
+
+      if (path == null) {
+        try {
+          Thread.sleep(100L);
+        } catch (InterruptedException ex) {
+          // log.error(e.toString(), e.getCause());
+        }
+        Service.CollectionCreated cc = service.getSignalHandler().getLastHandledSignal(Service.CollectionCreated.class);
+        path = cc.collection;
+      }
+
+      this.collection = new Collection(path, service);
+    }
+
+    unlock();
+  }
+  */
+
+  private void init() throws IOException {
+    try {
+<span class="nc" id="L147">      encryption = new TransportEncryption();</span>
+<span class="nc" id="L148">      encryption.initialize();</span>
+<span class="nc" id="L149">      encryption.openSession();</span>
+<span class="nc" id="L150">      encryption.generateSessionKey();</span>
+<span class="nc" id="L151">      service = encryption.getService();</span>
+<span class="nc" id="L152">      session = service.getSession();</span>
+<span class="nc" id="L153">      prompt = new Prompt(service);</span>
+<span class="nc" id="L154">      withoutPrompt = new InternalUnsupportedGuiltRiddenInterface(service);</span>
+<span class="fc" id="L155">    } catch (DBusException | NoSuchAlgorithmException | InvalidAlgorithmParameterException | InvalidKeySpecException</span>
+        | InvalidKeyException ex) {
+      // log.error(e.toString(), e.getCause());
+<span class="fc" id="L158">      throw new IOException(ex.toString(), ex.getCause());</span>
+<span class="nc" id="L159">    }</span>
+<span class="nc" id="L160">  }</span>
+
+  /*
+  private Map&lt;ObjectPath, String&gt; getLabels() {
+    List&lt;ObjectPath&gt; collections = service.getCollections();
+
+    Map&lt;ObjectPath, String&gt; labels = new HashMap&lt;&gt;();
+    for (ObjectPath path : collections) {
+      Collection collection = new Collection(path, service, null);
+      labels.put(path, collection.getLabel());
+    }
+
+    return labels;
+  }
+
+  private boolean exists(String label) {
+    Map&lt;ObjectPath, String&gt; labels = getLabels();
+    return labels.values().contains(label);
+  }
+
+  private ObjectPath getCollectionPath(String label) {
+    Map&lt;ObjectPath, String&gt; labels = getLabels();
+
+    ObjectPath path = null;
+    for (Map.Entry&lt;ObjectPath, String&gt; entry : labels.entrySet()) {
+      ObjectPath currentPath = entry.getKey();
+      String currentLabel = entry.getValue();
+      if (label.equals(currentLabel)) {
+        path = currentPath;
+        break;
+      }
+    }
+    return path;
+  }
+  */
+  
+  /*
+  private final boolean isDefault() {
+    List&lt;String&gt; defaults = Arrays.asList(null, &quot;login&quot;, &quot;session&quot;, &quot;default&quot;);
+    return defaults.contains(collection.getId());
+  }
+  */
+
+  private void performPrompt(ObjectPath path) {
+<span class="nc bnc" id="L204" title="All 2 branches missed.">    if (!(&quot;/&quot;.equals(path.getPath()))) {</span>
+<span class="nc" id="L205">      prompt.await(path);</span>
+    }
+<span class="nc" id="L207">  }</span>
+
+  private void unlock() {
+<span class="nc bnc" id="L210" title="All 2 branches missed.">    if (collection.isLocked()) {</span>
+<span class="nc bnc" id="L211" title="All 2 branches missed.">      if (encrypted == null) {</span>
+<span class="nc" id="L212">        Pair&lt;List&lt;ObjectPath&gt;, ObjectPath&gt; response = service.unlock(Arrays.asList(collection.getPath()));</span>
+<span class="nc" id="L213">        performPrompt(response.b);</span>
+<span class="nc" id="L214">      } else {</span>
+<span class="nc" id="L215">        withoutPrompt.unlockWithMasterPassword(collection.getPath(), encrypted);</span>
+      }
+    }
+<span class="nc" id="L218">  }</span>
+
+  private Item getItem(String path) {
+<span class="nc" id="L221">    return new Item(Static.Convert.toObjectPath(path), service);</span>
+  }
+
+  /*
+  private void getUserPermission() throws AccessControlException {
+    if (isDefault() &amp;&amp; enableUserPrompts) {
+      List&lt;ObjectPath&gt; lockable = Arrays.asList(collection.getPath());
+      service.lock(lockable);
+      try {
+        Thread.sleep(250L);
+      } catch (InterruptedException ex) {
+        //fail silently?
+      }
+      Pair&lt;List&lt;ObjectPath&gt;, ObjectPath&gt; response = service.unlock(lockable);
+      performPrompt(response.b);
+      if (collection.isLocked()) {
+        throw new AccessControlException(
+            &quot;One may not read all passwords from a default collection without permission.&quot;);
+      }
+    }
+  }
+  */
+
+  /**
+   * Clears the private key of the transport encryption and the passphrase of the
+   * collection.
+   */
+  public void clear() {
+<span class="nc bnc" id="L249" title="All 2 branches missed.">    if (encryption != null) {</span>
+<span class="nc" id="L250">      encryption.clear();</span>
+    }
+<span class="nc bnc" id="L252" title="All 2 branches missed.">    if (encrypted != null) {</span>
+<span class="nc" id="L253">      encrypted.clear();</span>
+    }
+<span class="nc" id="L255">  }</span>
+
+  @Override
+  public void close() {
+<span class="nc" id="L259">    clear();</span>
+<span class="nc" id="L260">  }</span>
+
+  /**
+   * Delete this collection.
+   * @throws AccessControlException if user is prompted and refuses.
+   * 
+   */
+  /*
+  public void delete() throws AccessControlException {
+    if (!isDefault()) {
+      ObjectPath promptPath = collection.delete();
+      performPrompt(promptPath);
+    } else {
+      throw new AccessControlException(&quot;Default collections may not be deleted with the simple API.&quot;);
+    }
+  }
+  */
+
+  /**
+   * Creates an item with the provided properties in this collection.
+   *
+   * @param label      The displayable label of the new item
+   * @param password   The password of the new item
+   * @param attributes The attributes of the new item
+   *
+   * @return DBus object path
+   *
+   * @throws IllegalArgumentException if inputs are null
+   */
+  @SuppressWarnings(&quot;rawtypes&quot;)
+  public String createItem(String label, CharSequence password, Map&lt;String, String&gt; attributes)
+      throws IllegalArgumentException {
+
+<span class="nc bnc" id="L293" title="All 2 branches missed.">    if (password == null) {</span>
+<span class="nc" id="L294">      throw new IllegalArgumentException(&quot;The password may not be null.&quot;);</span>
+    }
+<span class="nc bnc" id="L296" title="All 2 branches missed.">    if (label == null) {</span>
+<span class="nc" id="L297">      throw new IllegalArgumentException(&quot;The label of the password may not be null.&quot;);</span>
+    }
+
+<span class="nc" id="L300">    unlock();</span>
+
+<span class="nc" id="L302">    DBusPath item = null;</span>
+<span class="nc" id="L303">    final Map&lt;String, Variant&gt; properties = Item.createProperties(label, attributes);</span>
+<span class="nc" id="L304">    try (final Secret secret = encryption.encrypt(password)) {</span>
+<span class="nc" id="L305">      Pair&lt;ObjectPath, ObjectPath&gt; response = collection.createItem(properties, secret, false);</span>
+<span class="nc" id="L306">      item = response.a;</span>
+<span class="nc bnc" id="L307" title="All 2 branches missed.">      if (&quot;/&quot;.equals(item.getPath())) {</span>
+<span class="nc" id="L308">        Completed completed = prompt.await(response.b);</span>
+<span class="nc bnc" id="L309" title="All 2 branches missed.">        if (!completed.dismissed) {</span>
+<span class="nc" id="L310">          Collection.ItemCreated ic = collection.getSignalHandler().getLastHandledSignal(Collection.ItemCreated.class);</span>
+<span class="nc" id="L311">          item = ic.item;</span>
+        }
+      }
+<span class="nc" id="L314">    } catch (NoSuchAlgorithmException | NoSuchPaddingException | InvalidAlgorithmParameterException</span>
+        | InvalidKeyException | BadPaddingException | IllegalBlockSizeException ex) {
+        // log.error(e.toString(), e.getCause());
+<span class="nc" id="L317">    }</span>
+
+<span class="nc" id="L319">    return item.getPath();</span>
+  }
+
+  /**
+   * Creates an item with the provided properties in this collection.
+   *
+   * @param label    The displayable label of the new item
+   * @param password The password of the new item
+   *
+   * @return DBus object path
+   *
+   * @throws IllegalArgumentException if inputs are null
+   */
+  public String createItem(String label, CharSequence password) throws IllegalArgumentException {
+<span class="nc" id="L333">    return createItem(label, password, null);</span>
+  }
+
+  /**
+   * Updates an item with the provided properties.
+   *
+   * @param objectPath The DBus object path of the item
+   * @param label      The displayable label of the new item
+   * @param password   The password of the new item
+   * @param attributes The attributes of the new item
+   *
+   * @throws IllegalArgumentException if inputs are null
+   */
+  public void updateItem(String objectPath, String label, CharSequence password, Map&lt;String, String&gt; attributes)
+      throws IllegalArgumentException {
+
+<span class="nc bnc" id="L349" title="All 2 branches missed.">    if (objectPath == null) {</span>
+<span class="nc" id="L350">      throw new IllegalArgumentException(&quot;The object path of the item may not be null.&quot;);</span>
+    }
+
+<span class="nc" id="L353">    unlock();</span>
+
+<span class="nc" id="L355">    Item item = getItem(objectPath);</span>
+
+<span class="nc bnc" id="L357" title="All 2 branches missed.">    if (label != null) {</span>
+<span class="nc" id="L358">      item.setLabel(label);</span>
+    }
+
+<span class="nc bnc" id="L361" title="All 2 branches missed.">    if (attributes != null) {</span>
+<span class="nc" id="L362">      item.setAttributes(attributes);</span>
+    }
+
+<span class="nc bnc" id="L365" title="All 2 branches missed.">    if (password != null) {</span>
+<span class="nc" id="L366">      try (Secret secret = encryption.encrypt(password)) {</span>
+<span class="nc" id="L367">        item.setSecret(secret);</span>
+<span class="nc" id="L368">      } catch (NoSuchAlgorithmException | NoSuchPaddingException | InvalidAlgorithmParameterException</span>
+          | InvalidKeyException | BadPaddingException | IllegalBlockSizeException ex) {
+          // log.error(e.toString(), e.getCause());
+<span class="nc" id="L371">      }</span>
+    }
+<span class="nc" id="L373">  }</span>
+
+  /**
+   * Get the displayable label of an item.
+   *
+   * @param objectPath The DBus object path of the item
+   *
+   * @return label
+   */
+  /*
+  public String getLabel(String objectPath) {
+    unlock();
+    return getItem(objectPath).getLabel();
+  }
+  */
+
+  /**
+   * Get the user specified attributes of an item.
+   * &lt;p&gt;
+   * NOTE:
+   * The attributes can contain an additional 'xdg:schema' key-value pair.
+   * &lt;/p&gt;
+   *
+   * @param objectPath The DBus object path of the item
+   *
+   * @return item attributes
+   */
+  /*
+  public Map&lt;String, String&gt; getAttributes(String objectPath) {
+    unlock();
+    return getItem(objectPath).getAttributes();
+  }
+  */
+
+  /**
+   * Get the object paths of items with given attributes.
+   *
+   * @param attributes The attributes of the secret
+   * 
+   * @return object paths
+   */
+  public List&lt;String&gt; getItems(Map&lt;String, String&gt; attributes) {
+<span class="nc" id="L415">    unlock();</span>
+
+<span class="nc" id="L417">    List&lt;ObjectPath&gt; objects = collection.searchItems(attributes);</span>
+
+<span class="nc bnc" id="L419" title="All 4 branches missed.">    if (objects != null &amp;&amp; !objects.isEmpty()) {</span>
+<span class="nc" id="L420">      return Static.Convert.toStrings(objects);</span>
+    } else {
+<span class="nc" id="L422">      return null;</span>
+    }
+  }
+
+  /**
+   * Get the secret of the item.
+   *
+   * @param objectPath The DBus object path of the item
+   *
+   * @return plain chars
+   */
+  public char[] getSecret(String objectPath) {
+<span class="nc" id="L434">    unlock();</span>
+
+<span class="nc" id="L436">    final Item item = getItem(objectPath);</span>
+
+<span class="nc" id="L438">    char[] decrypted = null;</span>
+<span class="nc" id="L439">    try (final Secret secret = item.getSecret(session.getPath())) {</span>
+<span class="nc" id="L440">      decrypted = encryption.decrypt(secret);</span>
+<span class="nc" id="L441">    } catch (NoSuchPaddingException | NoSuchAlgorithmException | InvalidAlgorithmParameterException</span>
+        | InvalidKeyException | BadPaddingException | IllegalBlockSizeException ex) {
+        // log.error(e.toString(), e.getCause());
+<span class="nc" id="L444">    }</span>
+<span class="nc" id="L445">    return decrypted;</span>
+  }
+
+  /**
+   * Get the secrets from this collection.
+   *
+   * @return Mapping of DBus object paths and plain chars
+   * @throws AccessControlException if user is prompted and refuses.
+   */
+  /*
+  public Map&lt;String, char[]&gt; getSecrets() throws AccessControlException {
+    getUserPermission();
+
+    List&lt;ObjectPath&gt; items = collection.getItems();
+
+    Map&lt;String, char[]&gt; passwords = new HashMap&lt;&gt;();
+    for (ObjectPath item : items) {
+      String path = item.getPath();
+      passwords.put(path, getSecret(path));
+    }
+
+    return passwords;
+  }
+  */
+
+  /**
+   * Delete an item from this collection.
+   *
+   * @param objectPath The DBus object path of the item
+   * @throws AccessControlException if user is prompted and refuses.
+   */
+  public void deleteItem(String objectPath) throws AccessControlException {
+    //getUserPermission();
+
+<span class="nc" id="L479">    Item item = getItem(objectPath);</span>
+<span class="nc" id="L480">    ObjectPath promptPath = item.delete();</span>
+<span class="nc" id="L481">    performPrompt(promptPath);</span>
+<span class="nc" id="L482">  }</span>
+
+  /**
+   * Delete specified items from this collection.
+   *
+   * @param objectPaths The DBus object paths of the items
+   * @throws AccessControlException if user is prompted and refuses.
+   */
+  /*
+  public void deleteItems(List&lt;String&gt; objectPaths) throws AccessControlException {
+    for (String item : objectPaths) {
+      deleteItem(item);
+    }
+  }
+  */
+}
+</pre><div class="footer"><span class="right">Created with <a href="http://www.jacoco.org/jacoco">JaCoCo</a> 0.8.4.201905082037</span></div></body></html>
