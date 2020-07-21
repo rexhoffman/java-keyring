@@ -65,14 +65,14 @@ public class OsxKeychainBackendTest {
     assumeTrue(Platform.isMac());
     OsxKeychainBackend backend = new OsxKeychainBackend();
     catchThrowable(() -> backend.deletePassword(SERVICE, ACCOUNT));
-    checkExistanceOfPasswordEntry(backend);
+    checkExistenceOfPasswordEntry(backend);
     backend.setPassword(SERVICE, ACCOUNT, PASSWORD);
     assertThat(backend.getPassword(SERVICE, ACCOUNT)).isEqualTo(PASSWORD);
     backend.deletePassword(SERVICE, ACCOUNT);
     assertThatThrownBy(() -> backend.getPassword(SERVICE, ACCOUNT)).isInstanceOf(PasswordAccessException.class);
   }
 
-  private static void checkExistanceOfPasswordEntry(OsxKeychainBackend backend) {
+  private static void checkExistenceOfPasswordEntry(OsxKeychainBackend backend) {
     assertThatThrownBy(() -> backend.getPassword(SERVICE, ACCOUNT))
        .as("Please remove password entry '%s' " + "by using Keychain Access before running the tests", SERVICE)
        .isNotNull();

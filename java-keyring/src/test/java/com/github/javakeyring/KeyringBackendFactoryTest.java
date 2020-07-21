@@ -32,6 +32,7 @@ import static org.junit.Assert.fail;
 
 import java.util.stream.Stream;
 
+import com.github.javakeyring.internal.kde.KWalletBackend;
 import org.junit.Test;
 import org.junit.runner.RunWith;
 
@@ -71,7 +72,8 @@ public class KeyringBackendFactoryTest {
     } else if (Platform.isWindows()) {
       assertTrue(backend instanceof WinCredentialStoreBackend);
     } else if (Platform.isLinux()) {
-      assertTrue(backend instanceof FreedesktopKeyringBackend);
+      //linux may use GNOME_KEYRING or KWALLET
+      assertTrue((backend instanceof FreedesktopKeyringBackend) || (backend instanceof KWalletBackend));
     } else {
       fail("Unsupported platform");
     }

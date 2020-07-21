@@ -81,7 +81,10 @@ public class KeyringTest {
       assertThatThrownBy(() -> Keyring.create(KeyringStorageType.GNOME_KEYRING))
           .isInstanceOf(BackendNotSupportedException.class);
     } else if (Platform.isLinux()) {
-      assertThat(Keyring.create(KeyringStorageType.GNOME_KEYRING)).isNotNull();
+      //linux may use GNOME_KEYRING or KWALLET
+      KeyringStorageType type = Keyring.create().getKeyringStorageType();
+      assertThat(type == KeyringStorageType.GNOME_KEYRING || type == KeyringStorageType.KWALLET).isTrue();
+
       assertThatThrownBy(() -> Keyring.create(KeyringStorageType.OSX_KEYCHAIN))
           .isInstanceOf(BackendNotSupportedException.class);
       assertThatThrownBy(() -> Keyring.create(KeyringStorageType.WINDOWS_CREDENTIAL_STORE))

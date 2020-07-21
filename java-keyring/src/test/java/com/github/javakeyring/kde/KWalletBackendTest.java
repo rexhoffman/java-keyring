@@ -24,48 +24,45 @@
  * (INCLUDING NEGLIGENCE OR OTHERWISE) ARISING IN ANY WAY OUT OF THE USE OF THIS
  * SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
  */
-package com.github.javakeyring.freedesktop;
-
-import static org.assertj.core.api.Assertions.assertThat;
-import static org.assertj.core.api.Assertions.assertThatThrownBy;
-import static org.assertj.core.api.Assertions.catchThrowable;
-import static org.junit.Assume.assumeTrue;
+package com.github.javakeyring.kde;
 
 import com.github.javakeyring.Keyring;
 import com.github.javakeyring.KeyringStorageType;
+import com.github.javakeyring.PasswordAccessException;
+import com.github.javakeyring.internal.KeyringBackend;
+import com.github.javakeyring.internal.kde.KWalletBackend;
+import com.sun.jna.Platform;
 import org.junit.Test;
 
-import com.github.javakeyring.PasswordAccessException;
-import com.github.javakeyring.internal.freedesktop.FreedesktopKeyringBackend;
-import com.sun.jna.Platform;
+import static org.assertj.core.api.Assertions.assertThatThrownBy;
+import static org.assertj.core.api.Assertions.catchThrowable;
+import static org.assertj.core.api.Assertions.assertThat;
+import static org.junit.Assume.assumeTrue;
 
-/**
- * Test of GnomeKeyringBackend class.
- */
-public class FreedesktopKeyringBackedTest {
+public class KWalletBackendTest {
 
-  private static final String SERVICE = "com.github.javakeyring.gnome.test";
+  private static final String SERVICE = "com.github.javakeyring.kde.test";
 
-  private static final String ACCOUNT = "username_gnome";
+  private static final String ACCOUNT = "username_kde";
 
-  private static final String PASSWORD = "password_gnome";
+  private static final String PASSWORD = "password_kde";
 
   /**
-   * Test of setup method, of class GnomeKeyringBackend.
+   * Test of setup method, of class KWalletKeyringBackend.
    */
   @Test
   public void testSetup() throws Exception {
-    assumeTrue(Platform.isLinux() && Keyring.create().getKeyringStorageType() == KeyringStorageType.GNOME_KEYRING);
-    assertThat(catchThrowable(() -> new FreedesktopKeyringBackend())).as("Setup should succeed").doesNotThrowAnyException();
+    assumeTrue(Platform.isLinux() && Keyring.create().getKeyringStorageType() == KeyringStorageType.KWALLET);
+    assertThat(catchThrowable(KWalletBackend::new)).as("Setup should succeed").doesNotThrowAnyException();
   }
 
   /**
-   * Test of getPassword method, of class GnomeKeyringBackend.
+   * Test of getPassword method, of class KWalletKeyringBackend.
    */
   @Test
   public void testPasswordFlow() throws Exception {
-    assumeTrue(Platform.isLinux() && Keyring.create().getKeyringStorageType() == KeyringStorageType.GNOME_KEYRING);
-    FreedesktopKeyringBackend backend = new FreedesktopKeyringBackend();
+    assumeTrue(Platform.isLinux() && Keyring.create().getKeyringStorageType() == KeyringStorageType.KWALLET);
+    KeyringBackend backend = new KWalletBackend();
     catchThrowable(() -> backend.deletePassword(SERVICE, ACCOUNT));
     checkExistenceOfPasswordEntry(backend);
     backend.setPassword(SERVICE, ACCOUNT, PASSWORD);
@@ -74,9 +71,9 @@ public class FreedesktopKeyringBackedTest {
     assertThatThrownBy(() -> backend.getPassword(SERVICE, ACCOUNT)).isInstanceOf(PasswordAccessException.class);
   }
 
-  private static void checkExistenceOfPasswordEntry(FreedesktopKeyringBackend backend) {
+  private static void checkExistenceOfPasswordEntry(KeyringBackend backend) {
     assertThatThrownBy(() -> backend.getPassword(SERVICE, ACCOUNT))
-       .as("Please remove password entry '%s' " + "by using Keychain Access before running the tests", SERVICE)
-       .isNotNull();
+            .as("Please remove password entry '%s' " + "by using Keychain Access before running the tests", SERVICE)
+            .isNotNull();
   }
 }
