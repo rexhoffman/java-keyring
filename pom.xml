@@ -5,7 +5,7 @@
     <parent>
         <groupId>com.salesforce.maven</groupId>
         <artifactId>MavenParent</artifactId>
-        <version>1.0.19</version>
+        <version>2.0.1</version>
     </parent>
 
     <groupId>com.github.javakeyring</groupId>
