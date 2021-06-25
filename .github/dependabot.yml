@@ -1,0 +1,24 @@
+version: 2
+updates:
+- package-ecosystem: maven
+  directory: "/"
+  schedule:
+    interval: daily
+  open-pull-requests-limit: 10
+  ignore:
+  - dependency-name: de.swiesend:secret-service
+    versions:
+    - 1.4.0
+    - 1.5.0
+    - 1.6.1
+  - dependency-name: com.salesforce.maven:MavenParent
+    versions:
+    - 2.0.0
+  - dependency-name: net.java.dev.jna:jna-platform
+    versions:
+    - 5.6.0
+    - 5.7.0
+  - dependency-name: net.java.dev.jna:jna
+    versions:
+    - 5.6.0
+    - 5.7.0
